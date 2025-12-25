@@ -1,0 +1,28 @@
+@use '../../../../styles/variables' as vars;
+
+.top-bar {
+  &__toolbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background-color: vars.$bg-surface;
+    color: vars.$text-primary;
+    border-bottom: 1px solid vars.$border-color;
+    box-shadow: none !important; // Override material elevation if present
+  }
+
+  &__menu-button {
+    margin-right: 8px;
+    color: vars.$text-secondary;
+  }
+
+  &__title {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: vars.$primary-color;
+  }
+
+  &__spacer {
+    flex: 1 1 auto;
+  }
+}

@@ -1,0 +1,13 @@
+<app-top-bar (menuToggle)="toggleSidebar()"></app-top-bar>
+
+<mat-sidenav-container class="main-layout__container">
+  <mat-sidenav [mode]="sidebarMode()" [opened]="sidebarOpen()" class="main-layout__sidenav">
+    <app-sidebar></app-sidebar>
+  </mat-sidenav>
+
+  <mat-sidenav-content class="main-layout__content-wrapper">
+    <main class="main-layout__main">
+      <router-outlet></router-outlet>
+    </main>
+  </mat-sidenav-content>
+</mat-sidenav-container>

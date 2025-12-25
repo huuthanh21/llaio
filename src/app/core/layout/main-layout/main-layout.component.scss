@@ -1,0 +1,33 @@
+@use '../../../../styles/variables' as vars;
+
+// Local layout variables
+$top-bar-height: 64px;
+$sidenav-width: 250px;
+$main-content-max-width: 1400px;
+
+.main-layout {
+  &__container {
+    /* Subtract top bar height */
+    height: calc(100vh - #{$top-bar-height});
+  }
+
+  &__sidenav {
+    width: $sidenav-width;
+    border-right: 1px solid vars.$border-color;
+  }
+
+  &__content-wrapper {
+    background-color: vars.$background-color;
+  }
+
+  &__main {
+    padding: 24px;
+    max-width: $main-content-max-width;
+    margin: 0 auto;
+
+    // Responsive padding for mobile
+    @media (max-width: 599px) {
+      padding: 16px;
+    }
+  }
+}
