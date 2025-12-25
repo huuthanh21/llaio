@@ -13,8 +13,9 @@ import { Language, LanguageStore } from '../../stores/language.store';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TopBarComponent {
-  protected readonly store = inject(LanguageStore);
   @Output() public readonly menuToggle = new EventEmitter<void>();
+
+  protected readonly store = inject(LanguageStore);
 
   protected languages: Language[] = [
     'Spanish',

@@ -11,10 +11,5 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SidebarComponent {
-  protected navItems = [
-    { label: 'Dashboard', route: '/', icon: 'dashboard' },
-    { label: 'Translator', route: '/translator', icon: 'translate' },
-    { label: 'Vocab Builder', route: '/vocab', icon: 'school' },
-    { label: 'Scenario Practice', route: '/scenario', icon: 'chat' },
-  ];
+  protected navItems = [{ label: 'Word Definition', route: '/lookup', icon: 'translate' }];
 }

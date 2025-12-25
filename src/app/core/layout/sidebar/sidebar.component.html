@@ -4,6 +4,7 @@
       mat-list-item
       [routerLink]="item.route"
       routerLinkActive="sidebar__nav-item--active"
+      [routerLinkActiveOptions]="{ exact: item.route === '/' }"
       class="sidebar__nav-item"
     >
       <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>

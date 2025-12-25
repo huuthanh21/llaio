@@ -1,0 +1,96 @@
+<div class="word-definition">
+  <div class="word-definition__header">
+    <mat-card class="word-definition__search-card">
+      <mat-card-content class="word-definition__search-content">
+        <mat-form-field appearance="outline" class="word-definition__search-field">
+          <mat-label>Enter a word</mat-label>
+          <input
+            matInput
+            [formControl]="searchControl"
+            (keyup.enter)="onSearch()"
+            placeholder="e.g. Serendipity"
+          />
+          @if (searchControl.value) {
+            <button
+              matSuffix
+              mat-icon-button
+              aria-label="Clear"
+              (click)="searchControl.setValue('')"
+            >
+              <mat-icon>close</mat-icon>
+            </button>
+          }
+        </mat-form-field>
+        <div class="word-definition__search-actions">
+          <button
+            mat-flat-button
+            color="primary"
+            (click)="onSearch()"
+            [disabled]="isLoading() || !searchControl.value"
+          >
+            @if (isLoading()) {
+              <mat-spinner diameter="20"></mat-spinner>
+            } @else {
+              Define
+            }
+          </button>
+          <button mat-stroked-button (click)="onReset()" [disabled]="isLoading()">Reset</button>
+          <button
+            mat-icon-button
+            [matMenuTriggerFor]="historyMenu"
+            aria-label="Search History"
+            title="Search History"
+            [disabled]="searchHistory().length === 0"
+          >
+            <mat-icon>history</mat-icon>
+          </button>
+          <mat-menu #historyMenu="matMenu">
+            <div class="word-definition__history-menu-header">
+              <span>Search History</span>
+              <button
+                mat-icon-button
+                (click)="clearHistory(); $event.stopPropagation()"
+                aria-label="Clear History"
+                title="Clear History"
+              >
+                <mat-icon>delete_sweep</mat-icon>
+              </button>
+            </div>
+            <mat-divider></mat-divider>
+            @for (word of searchHistory(); track word) {
+              <button mat-menu-item (click)="onSearch(word)">
+                <mat-icon>history</mat-icon>
+                <span>{{ word }}</span>
+              </button>
+            }
+          </mat-menu>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <div class="word-definition__results">
+    @if (isLoading()) {
+      <div class="word-definition__state word-definition__state--loading">
+        <mat-spinner diameter="50"></mat-spinner>
+        <p>Analyzing word nuance...</p>
+      </div>
+    } @else if (error()) {
+      <div class="word-definition__state word-definition__state--error">
+        <mat-icon color="warn">error</mat-icon>
+        <p>{{ error() }}</p>
+      </div>
+    } @else if (definition()) {
+      <mat-card class="word-definition__definition-card">
+        <mat-card-content>
+          <div class="word-definition__markdown-content" [innerHTML]="definition()"></div>
+        </mat-card-content>
+      </mat-card>
+    } @else {
+      <div class="word-definition__state word-definition__state--empty">
+        <mat-icon class="word-definition__state-icon">school</mat-icon>
+        <p>Enter a word to start learning.</p>
+      </div>
+    }
+  </div>
+</div>

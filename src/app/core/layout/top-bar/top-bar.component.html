@@ -10,7 +10,7 @@
   <span class="top-bar__title">Llaio</span>
   <span class="top-bar__spacer"></span>
 
-  <button mat-button [matMenuTriggerFor]="langMenu">
+  <button mat-button [matMenuTriggerFor]="langMenu" class="top-bar__lang-button">
     Target: {{ store.targetLanguage() }}
     <mat-icon>arrow_drop_down</mat-icon>
   </button>

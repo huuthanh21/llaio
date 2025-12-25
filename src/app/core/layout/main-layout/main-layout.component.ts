@@ -23,6 +23,7 @@ import { TopBarComponent } from '../top-bar/top-bar.component';
 })
 export class MainLayoutComponent {
   private readonly breakpointObserver = inject(BreakpointObserver);
+
   private readonly router = inject(Router);
 
   // Detect mobile breakpoint (max-width: 768px)
