@@ -1,0 +1,25 @@
+<mat-toolbar class="top-bar__toolbar">
+  <button
+    mat-icon-button
+    (click)="menuToggle.emit()"
+    aria-label="Toggle sidebar navigation"
+    class="top-bar__menu-button"
+  >
+    <mat-icon>menu</mat-icon>
+  </button>
+  <span class="top-bar__title">Llaio</span>
+  <span class="top-bar__spacer"></span>
+
+  <button mat-button [matMenuTriggerFor]="langMenu">
+    Target: {{ store.targetLanguage() }}
+    <mat-icon>arrow_drop_down</mat-icon>
+  </button>
+
+  <mat-menu #langMenu="matMenu">
+    @for (lang of languages; track lang) {
+      <button mat-menu-item (click)="store.setLanguage(lang)">
+        {{ lang }}
+      </button>
+    }
+  </mat-menu>
+</mat-toolbar>

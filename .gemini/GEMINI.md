@@ -1,4 +1,4 @@
-You are an expert in TypeScript, Angular, and scalable web application development. You write functional, maintainable, performant, and accessible code following Angular and TypeScript best practices.
+You are an expert in TypeScript, Angular 21, and scalable web application development. You write functional, maintainable, performant, and accessible code following Angular and TypeScript best practices.
 
 ## TypeScript Best Practices
 
@@ -24,10 +24,11 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 ### Components
 
 - Keep components small and focused on a single responsibility
-- Use `input()` and `output()` functions instead of decorators
+- Always use `@Input()` and `@Output()` decorators instead of functions
+- Always use access modifiers (`public`, `private`, `protected`)
 - Use `computed()` for derived state
 - Set `changeDetection: ChangeDetectionStrategy.OnPush` in `@Component` decorator
-- Prefer inline templates for small components
+- Always use separated templates and styles files.
 - Prefer Reactive forms instead of Template-driven ones
 - Do NOT use `ngClass`, use `class` bindings instead
 - Do NOT use `ngStyle`, use `style` bindings instead
@@ -48,8 +49,50 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 - Do not assume globals like (`new Date()`) are available.
 - Do not write arrow functions in templates (they are not supported).
 
+## Styling
+
+- Use SCSS for styling
+- Use BEM for class naming
+- Use SCSS variables for themeable styles
+
 ## Services
 
 - Design services around a single responsibility
 - Use the `providedIn: 'root'` option for singleton services
 - Use the `inject()` function instead of constructor injection
+
+## Project Context: LLAIO
+
+### Tech Stack
+
+- **Framework**: Angular 21 (Standalone Components)
+- **State Management**: @ngrx/signals (Global Signal Stores)
+- **UI Library**: Angular Material 21 (M2 Theme), Bootstrap 5.3 (Grid/Utilities)
+- **Styles**: SCSS, BEM, Custom Properties
+- **Build**: Vite/Esbuild (Angular CLI default)
+
+### Architecture
+
+- **Core (`src/app/core`)**: Singleton services, global stores, main layout components.
+- **Features (`src/app/features`)**: Lazy-loaded feature routes. Each feature is self-contained.
+- **Shared (`src/app/shared`)**: Reusable UI components (e.g., `page-header`), pipes, directives.
+- **Routing**: Defined in `app.routes.ts`, lazy loading features via `loadComponent`.
+
+### State Management Pattern
+
+- **Global State**: Signal Stores provided in root (e.g., `LanguageStore`).
+- **Pattern**: `withState`, `withMethods` for actions (e.g., `setLanguage`).
+- **Usage**: Inject store directly in components.
+
+### Styling & Design
+
+- **Theme**: Custom Angular Material theme (M2) with primary (Indigo) and accent (Pink) palettes.
+- **Typography**: Inter font family.
+- **Global Styles**: Defined in `styles.scss` (includes Material core, Bootstrap grid).
+- **Variables**: `src/styles/_variables.scss` for colors/spacing.
+
+### Key Rules
+
+- **Components**: Standalone, `OnPush` change detection, Signals for local state.
+- **Forms**: Reactive Forms preferred.
+- **Control Flow**: New Angular `@if`, `@for` syntax.

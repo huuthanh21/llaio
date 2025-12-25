@@ -2,6 +2,7 @@
 const eslintKey = require('typescript-eslint');
 const angular = require('angular-eslint');
 const eslintPluginPrettierRecommended = require('eslint-plugin-prettier/recommended');
+const tseslint = require('typescript-eslint');
 
 module.exports = eslintKey.config(
   {
@@ -11,9 +12,11 @@ module.exports = eslintKey.config(
       eslintKey.configs.stylistic,
       ...angular.configs.tsRecommended,
       eslintPluginPrettierRecommended,
+      tseslint.configs.recommended,
     ],
     processor: angular.processInlineTemplates,
     rules: {
+      '@typescript-eslint/explicit-member-accessibility': 'error',
       '@angular-eslint/directive-selector': [
         'error',
         {
