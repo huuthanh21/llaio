@@ -1,22 +1,28 @@
 // @ts-check
-const eslintKey = require('typescript-eslint');
-const angular = require('angular-eslint');
-const eslintPluginPrettierRecommended = require('eslint-plugin-prettier/recommended');
-const tseslint = require('typescript-eslint');
+import eslint from '@eslint/js';
+import stylistic from '@stylistic/eslint-plugin';
+import angular from 'angular-eslint';
+import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
+import { defineConfig } from 'eslint/config';
+import tseslint from 'typescript-eslint';
 
-module.exports = eslintKey.config(
+export default defineConfig(
   {
     files: ['**/*.ts'],
     extends: [
-      eslintKey.configs.recommended,
-      eslintKey.configs.stylistic,
+      eslint.configs.recommended,
+      tseslint.configs.strict,
+      tseslint.configs.stylistic,
       ...angular.configs.tsRecommended,
       eslintPluginPrettierRecommended,
-      tseslint.configs.recommended,
     ],
+    plugins: {
+      '@stylistic': stylistic,
+    },
     processor: angular.processInlineTemplates,
     rules: {
       '@typescript-eslint/explicit-member-accessibility': 'error',
+      '@stylistic/lines-between-class-members': 'error',
       '@angular-eslint/directive-selector': [
         'error',
         {

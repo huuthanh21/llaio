@@ -5,24 +5,59 @@
     position: sticky;
     top: 0;
     z-index: 1000;
-    background-color: vars.$bg-surface;
-    color: vars.$text-primary;
-    border-bottom: 1px solid vars.$border-color;
-    box-shadow: none !important; // Override material elevation if present
+    background: linear-gradient(135deg, vars.$primary-color 0%, vars.$primary-dark 100%);
+    color: vars.$text-on-primary;
+    border-bottom: none;
+    box-shadow: vars.$shadow-md;
+    padding: 0 1rem;
   }
 
   &__menu-button {
     margin-right: 8px;
-    color: vars.$text-secondary;
+    color: rgba(255, 255, 255, 0.9);
+    transition: all vars.$transition-fast;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.15);
+      transform: scale(1.05);
+    }
   }
 
   &__title {
-    font-weight: 600;
-    font-size: 1.1rem;
-    color: vars.$primary-color;
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: vars.$text-on-primary;
+    letter-spacing: -0.02em;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
   }
 
   &__spacer {
     flex: 1 1 auto;
+  }
+
+  &__lang-button {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    border-radius: vars.$radius-full;
+    padding: 6px 16px;
+    color: vars.$text-on-primary;
+    font-weight: 500;
+    transition: all vars.$transition-fast;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.25);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .mat-icon {
+      color: rgba(255, 255, 255, 0.9);
+      transition: transform vars.$transition-fast;
+    }
+
+    &:hover .mat-icon {
+      transform: translateY(2px);
+    }
   }
 }

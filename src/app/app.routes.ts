@@ -7,9 +7,11 @@ export const routes: Routes = [
     component: MainLayoutComponent,
     children: [
       {
-        path: '',
+        path: 'lookup',
         loadComponent: () =>
-          import('./features/demo-page/demo-page.component').then((m) => m.DemoPageComponent),
+          import('./features/word-definition/word-definition.component').then(
+            (m) => m.WordDefinitionComponent,
+          ),
       },
     ],
   },

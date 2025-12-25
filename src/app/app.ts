@@ -6,4 +6,5 @@ import { RouterOutlet } from '@angular/router';
   imports: [RouterOutlet],
   templateUrl: './app.component.html',
 })
+// eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class App {}

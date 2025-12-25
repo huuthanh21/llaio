@@ -2,7 +2,7 @@
 
 // Local layout variables
 $top-bar-height: 64px;
-$sidenav-width: 250px;
+$sidenav-width: 260px;
 $main-content-max-width: 1400px;
 
 .main-layout {
@@ -13,21 +13,22 @@ $main-content-max-width: 1400px;
 
   &__sidenav {
     width: $sidenav-width;
-    border-right: 1px solid vars.$border-color;
+    border-right: none;
+    box-shadow: vars.$shadow-sm;
   }
 
   &__content-wrapper {
-    background-color: vars.$background-color;
+    background: vars.$gradient-surface;
   }
 
   &__main {
-    padding: 24px;
+    padding: 2rem;
     max-width: $main-content-max-width;
     margin: 0 auto;
 
     // Responsive padding for mobile
     @media (max-width: 599px) {
-      padding: 16px;
+      padding: 1rem;
     }
   }
 }

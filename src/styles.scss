@@ -37,12 +37,19 @@ body {
   height: 100%;
 }
 
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
-  // Ensure global font family is also set
   font-family: 'Inter', Roboto, 'Helvetica Neue', sans-serif;
   background-color: vars.$bg-body;
   color: vars.$text-primary;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 // Override headings to ensure they pick up Inter
@@ -54,4 +61,54 @@ h5,
 h6 {
   font-family: 'Inter', sans-serif;
   margin-top: 0;
+  color: vars.$gray-800;
+}
+
+// Global button enhancements
+.mat-mdc-button,
+.mat-mdc-outlined-button,
+.mat-mdc-unelevated-button,
+.mat-mdc-raised-button {
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+// Flat buttons with primary color get enhanced shadow
+.mat-mdc-unelevated-button.mat-primary {
+  transition:
+    background-color vars.$transition-fast,
+    box-shadow vars.$transition-fast,
+    transform vars.$transition-fast;
+
+  &:hover:not(:disabled) {
+    box-shadow: vars.$shadow-primary;
+  }
+}
+
+// Cards get subtle enhancement
+.mat-mdc-card {
+  border-radius: vars.$radius-lg !important;
+  transition:
+    box-shadow vars.$transition-base,
+    transform vars.$transition-base;
+}
+
+// Input field focus enhancement
+.mat-mdc-form-field.mat-focused {
+  .mdc-notched-outline__leading,
+  .mdc-notched-outline__notch,
+  .mdc-notched-outline__trailing {
+    border-color: vars.$primary-color !important;
+  }
+}
+
+// Smooth scrolling
+html {
+  scroll-behavior: smooth;
+}
+
+// Selection color
+::selection {
+  background-color: rgba(vars.$primary-color, 0.2);
+  color: vars.$text-primary;
 }

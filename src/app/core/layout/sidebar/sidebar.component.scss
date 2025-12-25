@@ -1,29 +1,60 @@
 @use '../../../../styles/variables' as vars;
 
+:host {
+  display: block;
+  height: 100%;
+  background: vars.$gradient-sidebar;
+}
+
 .sidebar {
   &__nav-list {
-    padding: 12px;
-    padding-top: 16px; // Ensure top spacing
+    padding: 1rem;
+    padding-top: 1.25rem;
+
+    // Use Material's CSS custom properties for consistent theming
+    --mdc-list-list-item-hover-state-layer-color: #{vars.$primary-color};
+    --mdc-list-list-item-hover-state-layer-opacity: 0.08;
+    --mdc-list-list-item-focus-state-layer-color: #{vars.$primary-color};
+    --mdc-list-list-item-focus-state-layer-opacity: 0.12;
   }
 
   &__nav-item {
-    border-radius: 8px;
-    margin-bottom: 4px;
+    border-radius: vars.$radius-md;
+    margin-bottom: 6px;
     color: vars.$text-secondary;
-    transition: all 0.2s ease;
+    transition:
+      color vars.$transition-base,
+      background-color vars.$transition-base;
 
-    &:hover {
-      background-color: rgba(0, 0, 0, 0.04);
-      color: vars.$text-primary;
+    .mat-icon {
+      transition: color vars.$transition-base;
+      color: vars.$text-muted;
     }
 
-    &--active {
-      background-color: vars.$primary-light;
+    &:hover {
       color: vars.$primary-color;
-      font-weight: 500;
 
       .mat-icon {
         color: vars.$primary-color;
+      }
+    }
+
+    // Active state with background
+    &--active {
+      background-color: vars.$primary-lighter;
+      color: vars.$primary-color;
+      font-weight: 600;
+
+      // Override Material's state layer for activated items
+      --mdc-list-list-item-hover-state-layer-opacity: 0;
+      --mdc-list-list-item-focus-state-layer-opacity: 0;
+
+      .mat-icon {
+        color: vars.$primary-color;
+      }
+
+      &:hover {
+        background-color: rgba(vars.$primary-color, 0.15);
       }
     }
   }
