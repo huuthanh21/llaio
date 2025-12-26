@@ -1,32 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { MatButtonModule } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
-import { MatDividerModule } from '@angular/material/divider';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
-import { MatMenuModule } from '@angular/material/menu';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { marked } from 'marked';
 import { GeminiService } from '../../core/services/gemini.service';
 import { WordHistoryService } from '../../core/services/word-history.service';
 
 @Component({
   selector: 'app-word-definition',
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatButtonModule,
-    MatCardModule,
-    MatProgressSpinnerModule,
-    MatIconModule,
-    MatMenuModule,
-    MatDividerModule,
-  ],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './word-definition.component.html',
   styleUrl: './word-definition.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -44,6 +25,8 @@ export class WordDefinitionComponent {
 
   protected error = signal<string | null>(null);
 
+  protected historyOpen = signal(false);
+
   // History
   protected searchHistory = this.wordHistoryService.history;
 
@@ -53,6 +36,7 @@ export class WordDefinitionComponent {
 
     // Update input if coming from history click
     this.searchControl.setValue(searchTerm);
+    this.historyOpen.set(false);
 
     this.error.set(null);
 
@@ -90,5 +74,10 @@ export class WordDefinitionComponent {
 
   public clearHistory() {
     this.wordHistoryService.clearHistory();
+    this.historyOpen.set(false);
+  }
+
+  protected toggleHistory(): void {
+    this.historyOpen.update((v) => !v);
   }
 }

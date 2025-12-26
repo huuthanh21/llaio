@@ -1,25 +1,76 @@
-<mat-toolbar class="top-bar__toolbar">
+<header class="top-bar">
+  <!-- Mobile Menu Button -->
   <button
-    mat-icon-button
+    class="geist-btn geist-btn--icon top-bar__menu-btn"
     (click)="menuToggle.emit()"
-    aria-label="Toggle sidebar navigation"
-    class="top-bar__menu-button"
+    aria-label="Toggle sidebar"
   >
-    <mat-icon>menu</mat-icon>
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.5"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
   </button>
-  <span class="top-bar__title">Llaio</span>
-  <span class="top-bar__spacer"></span>
 
-  <button mat-button [matMenuTriggerFor]="langMenu" class="top-bar__lang-button">
-    Target: {{ store.targetLanguage() }}
-    <mat-icon>arrow_drop_down</mat-icon>
-  </button>
+  <span class="top-bar__title">LLAIO</span>
 
-  <mat-menu #langMenu="matMenu">
-    @for (lang of languages; track lang) {
-      <button mat-menu-item (click)="store.setLanguage(lang)">
-        {{ lang }}
-      </button>
+  <div class="top-bar__spacer"></div>
+
+  <!-- Language Dropdown -->
+  <div class="top-bar__dropdown-container">
+    <button
+      class="geist-btn geist-btn--secondary top-bar__lang-btn"
+      (click)="toggleMenu()"
+      (keydown.escape)="menuOpen.set(false)"
+      [class.active]="menuOpen()"
+      [attr.aria-expanded]="menuOpen()"
+      aria-haspopup="listbox"
+    >
+      <span>{{ store.targetLanguage() }}</span>
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M6 9l6 6 6-6" />
+      </svg>
+    </button>
+
+    @if (menuOpen()) {
+      <div class="top-bar__dropdown-menu" role="listbox">
+        @for (lang of languages; track lang) {
+          <button
+            class="top-bar__dropdown-item"
+            role="option"
+            [attr.aria-selected]="store.targetLanguage() === lang"
+            (click)="store.setLanguage(lang); menuOpen.set(false)"
+            (keydown.escape)="menuOpen.set(false)"
+          >
+            {{ lang }}
+          </button>
+        }
+      </div>
+      <!-- Backdrop to close menu -->
+      <div
+        class="top-bar__dropdown-backdrop"
+        (click)="menuOpen.set(false)"
+        aria-hidden="true"
+      ></div>
     }
-  </mat-menu>
-</mat-toolbar>
+  </div>
+</header>
