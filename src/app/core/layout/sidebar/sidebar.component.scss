@@ -1,61 +1,50 @@
-@use '../../../../styles/variables' as vars;
-
 :host {
   display: block;
   height: 100%;
-  background: vars.$gradient-sidebar;
 }
 
-.sidebar {
-  &__nav-list {
-    padding: 1rem;
-    padding-top: 1.25rem;
+.sidebar-nav {
+  padding: 12px;
 
-    // Use Material's CSS custom properties for consistent theming
-    --mdc-list-list-item-hover-state-layer-color: #{vars.$primary-color};
-    --mdc-list-list-item-hover-state-layer-opacity: 0.08;
-    --mdc-list-list-item-focus-state-layer-color: #{vars.$primary-color};
-    --mdc-list-list-item-focus-state-layer-opacity: 0.12;
+  &__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
   }
 
-  &__nav-item {
-    border-radius: vars.$radius-md;
-    margin-bottom: 6px;
-    color: vars.$text-secondary;
-    transition:
-      color vars.$transition-base,
-      background-color vars.$transition-base;
-
-    .mat-icon {
-      transition: color vars.$transition-base;
-      color: vars.$text-muted;
-    }
+  &__link {
+    display: flex;
+    align-items: center;
+    height: 40px;
+    padding: 0 12px;
+    margin-bottom: 4px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--accents-5);
+    text-decoration: none;
+    transition: all 0.15s ease;
 
     &:hover {
-      color: vars.$primary-color;
-
-      .mat-icon {
-        color: vars.$primary-color;
-      }
+      background: var(--accents-2);
+      color: var(--geist-foreground);
     }
 
-    // Active state with background
     &--active {
-      background-color: vars.$primary-lighter;
-      color: vars.$primary-color;
-      font-weight: 600;
+      background: var(--geist-foreground) !important;
+      color: var(--geist-background) !important;
+    }
+  }
 
-      // Override Material's state layer for activated items
-      --mdc-list-list-item-hover-state-layer-opacity: 0;
-      --mdc-list-list-item-focus-state-layer-opacity: 0;
+  &__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 12px;
 
-      .mat-icon {
-        color: vars.$primary-color;
-      }
-
-      &:hover {
-        background-color: rgba(vars.$primary-color, 0.15);
-      }
+    svg {
+      width: 18px;
+      height: 18px;
     }
   }
 }

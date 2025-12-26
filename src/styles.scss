@@ -1,114 +1,210 @@
-@use '@angular/material' as mat;
-@use 'bootstrap/scss/bootstrap-grid';
-@use './styles/variables' as vars;
+@import url('https://rsms.me/inter/inter.css');
 
-// Define the typography config using M2 prefix
-$my-typography: mat.m2-define-typography-config(
-  $font-family: 'Inter, sans-serif',
-);
+:root {
+  /* Geist Palette */
+  --geist-background: #ffffff;
+  --geist-foreground: #000000;
 
-// Include the common styles for Angular Material including typography.
-@include mat.core();
+  --accents-1: #fafafa;
+  --accents-2: #eaeaea; /* Border color */
+  --accents-3: #999999;
+  --accents-4: #888888;
+  --accents-5: #666666;
+  --accents-6: #444444;
+  --accents-7: #333333;
+  --accents-8: #111111;
 
-// Define the palettes using M2 prefix
-$my-primary: mat.m2-define-palette(mat.$m2-indigo-palette, 500);
-$my-accent: mat.m2-define-palette(mat.$m2-pink-palette, A200, A100, A400);
-$my-warn: mat.m2-define-palette(mat.$m2-red-palette);
+  --geist-success: #0070f3;
+  --geist-error: #ee0000;
+  --geist-warning: #f5a623;
+  --geist-selection: #79ffe1;
 
-// Create the theme object using M2 prefix
-$my-theme: mat.m2-define-light-theme(
-  (
-    color: (
-      primary: $my-primary,
-      accent: $my-accent,
-      warn: $my-warn,
-    ),
-    typography: $my-typography,
-    density: 0,
-  )
-);
+  /* Typography */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
-// Include theme styles for core and all components.
-@include mat.all-component-themes($my-theme);
+  /* Spacing / Radius */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 12px;
 
-/* Global Styles */
-html,
-body {
-  height: 100%;
+  /* Layout */
+  --header-height: 64px;
 }
 
+body {
+  font-family: var(--font-sans);
+  background-color: var(--geist-background);
+  color: var(--geist-foreground);
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+}
+
+/* Global Reset */
 *,
 *::before,
 *::after {
   box-sizing: border-box;
 }
 
-body {
-  margin: 0;
-  font-family: 'Inter', Roboto, 'Helvetica Neue', sans-serif;
-  background-color: vars.$bg-body;
-  color: vars.$text-primary;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-// Override headings to ensure they pick up Inter
 h1,
 h2,
 h3,
 h4,
 h5,
 h6 {
-  font-family: 'Inter', sans-serif;
-  margin-top: 0;
-  color: vars.$gray-800;
+  margin: 0 0 1rem 0;
+  color: var(--geist-foreground);
+  letter-spacing: -0.02em;
 }
 
-// Global button enhancements
-.mat-mdc-button,
-.mat-mdc-outlined-button,
-.mat-mdc-unelevated-button,
-.mat-mdc-raised-button {
+p {
+  margin: 0 0 1rem 0;
+  line-height: 1.6;
+  color: var(--accents-6);
+}
+
+/* -------------------------------------------------------------------------- */
+/*                               Geist Utilities                              */
+/* -------------------------------------------------------------------------- */
+
+/* Buttons */
+.geist-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  padding: 0 16px;
+  height: 40px;
+  font-size: 14px;
   font-weight: 500;
-  letter-spacing: 0.01em;
-}
+  transition: all 0.15s ease;
+  cursor: pointer;
+  border: 1px solid transparent;
+  user-select: none;
+  text-decoration: none;
+  gap: 8px;
 
-// Flat buttons with primary color get enhanced shadow
-.mat-mdc-unelevated-button.mat-primary {
-  transition:
-    background-color vars.$transition-fast,
-    box-shadow vars.$transition-fast,
-    transform vars.$transition-fast;
+  &--primary {
+    background: var(--geist-foreground);
+    color: var(--geist-background);
+    border-color: var(--geist-foreground);
 
-  &:hover:not(:disabled) {
-    box-shadow: vars.$shadow-primary;
+    &:hover:not(:disabled) {
+      background: var(--accents-7);
+      border-color: var(--accents-7);
+    }
+  }
+
+  &--secondary {
+    background: var(--geist-background);
+    color: var(--geist-foreground);
+    border-color: var(--accents-2);
+
+    &:hover:not(:disabled) {
+      border-color: var(--geist-foreground);
+    }
+  }
+
+  &--icon {
+    padding: 0;
+    width: 40px;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 }
 
-// Cards get subtle enhancement
-.mat-mdc-card {
-  border-radius: vars.$radius-lg !important;
-  transition:
-    box-shadow vars.$transition-base,
-    transform vars.$transition-base;
-}
+/* Cards */
+.geist-card {
+  background: var(--geist-background);
+  border: 1px solid var(--accents-2);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  position: relative;
 
-// Input field focus enhancement
-.mat-mdc-form-field.mat-focused {
-  .mdc-notched-outline__leading,
-  .mdc-notched-outline__notch,
-  .mdc-notched-outline__trailing {
-    border-color: vars.$primary-color !important;
+  &--hover:hover {
+    border-color: var(--accents-5);
   }
 }
 
-// Smooth scrolling
-html {
-  scroll-behavior: smooth;
+/* Inputs */
+.geist-label {
+  display: block;
+  font-size: 13px;
+  color: var(--accents-5);
+  margin-bottom: 8px;
+  font-weight: 500;
 }
 
-// Selection color
-::selection {
-  background-color: rgba(vars.$primary-color, 0.2);
-  color: vars.$text-primary;
+.geist-input {
+  width: 100%;
+  height: 40px;
+  padding: 0 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--accents-2);
+  background: var(--geist-background);
+  color: var(--geist-foreground);
+  font-size: 14px;
+  font-family: inherit;
+  transition: border-color 0.15s ease;
+  outline: none;
+  appearance: none;
+
+  &:focus {
+    border-color: var(--geist-foreground);
+  }
+
+  &::placeholder {
+    color: var(--accents-3);
+  }
+
+  &--large {
+    height: 48px;
+    font-size: 16px;
+  }
+}
+
+/* Loading Spinner */
+.geist-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--accents-2);
+  border-left-color: var(--geist-foreground);
+  border-radius: 50%;
+  animation: spinner-spin 0.6s linear infinite;
+
+  &--large {
+    width: 32px;
+    height: 32px;
+    border-width: 3px;
+  }
+}
+
+@keyframes spinner-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Custom Scrollbar for Webkit */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--accents-2);
+  border-radius: var(--radius-sm);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accents-4);
 }

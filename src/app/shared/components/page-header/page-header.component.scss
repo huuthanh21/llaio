@@ -1,9 +1,5 @@
-@use '../../../../styles/variables' as vars;
-
 .page-header {
-  // Bootstrap handling most layout, but we can hook in here
-
   &__title {
-    color: vars.$text-primary;
+    color: var(--geist-foreground);
   }
 }

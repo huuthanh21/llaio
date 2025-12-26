@@ -1,13 +1,21 @@
-<app-top-bar (menuToggle)="toggleSidebar()"></app-top-bar>
+<div class="main-layout" [class.main-layout--sidebar-open]="sidebarOpen()">
+  <aside class="main-layout__sidebar">
+    <div class="main-layout__sidebar-content">
+      <app-sidebar></app-sidebar>
+    </div>
+  </aside>
 
-<mat-sidenav-container class="main-layout__container">
-  <mat-sidenav [mode]="sidebarMode()" [opened]="sidebarOpen()" class="main-layout__sidenav">
-    <app-sidebar></app-sidebar>
-  </mat-sidenav>
-
-  <mat-sidenav-content class="main-layout__content-wrapper">
+  <div class="main-layout__wrapper">
+    <app-top-bar (menuToggle)="toggleSidebar()"></app-top-bar>
     <main class="main-layout__main">
-      <router-outlet></router-outlet>
+      <div class="main-layout__content">
+        <router-outlet></router-outlet>
+      </div>
     </main>
-  </mat-sidenav-content>
-</mat-sidenav-container>
+  </div>
+
+  <!-- Mobile overlay -->
+  @if (sidebarOpen()) {
+    <div class="main-layout__overlay" (click)="toggleSidebar()" aria-hidden="true"></div>
+  }
+</div>

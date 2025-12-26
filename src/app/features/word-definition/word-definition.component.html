@@ -1,94 +1,208 @@
 <div class="word-definition">
   <div class="word-definition__header">
-    <mat-card class="word-definition__search-card">
-      <mat-card-content class="word-definition__search-content">
-        <mat-form-field appearance="outline" class="word-definition__search-field">
-          <mat-label>Enter a word</mat-label>
-          <input
-            matInput
-            [formControl]="searchControl"
-            (keyup.enter)="onSearch()"
-            placeholder="e.g. Serendipity"
-          />
-          @if (searchControl.value) {
-            <button
-              matSuffix
-              mat-icon-button
-              aria-label="Clear"
-              (click)="searchControl.setValue('')"
-            >
-              <mat-icon>close</mat-icon>
-            </button>
-          }
-        </mat-form-field>
-        <div class="word-definition__search-actions">
+    <div class="geist-card">
+      <div class="word-definition__search-content">
+        <div class="word-definition__input-group">
+          <label class="geist-label" for="word-search">Enter a word</label>
+          <div class="word-definition__input-wrapper">
+            <input
+              id="word-search"
+              class="geist-input geist-input--large"
+              [formControl]="searchControl"
+              (keyup.enter)="onSearch()"
+              placeholder="e.g. Serendipity"
+              autocomplete="off"
+            />
+            @if (searchControl.value) {
+              <button
+                class="geist-btn geist-btn--icon word-definition__clear-btn"
+                aria-label="Clear"
+                (click)="searchControl.setValue('')"
+              >
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            }
+          </div>
+        </div>
+
+        <div class="word-definition__actions">
           <button
-            mat-flat-button
-            color="primary"
+            class="geist-btn geist-btn--primary"
             (click)="onSearch()"
             [disabled]="isLoading() || !searchControl.value"
           >
             @if (isLoading()) {
-              <mat-spinner diameter="20"></mat-spinner>
+              <div class="geist-spinner"></div>
             } @else {
               Define
             }
           </button>
-          <button mat-stroked-button (click)="onReset()" [disabled]="isLoading()">Reset</button>
+
           <button
-            mat-icon-button
-            [matMenuTriggerFor]="historyMenu"
-            aria-label="Search History"
-            title="Search History"
-            [disabled]="searchHistory().length === 0"
+            class="geist-btn geist-btn--secondary"
+            (click)="onReset()"
+            [disabled]="isLoading()"
           >
-            <mat-icon>history</mat-icon>
+            Reset
           </button>
-          <mat-menu #historyMenu="matMenu">
-            <div class="word-definition__history-menu-header">
-              <span>Search History</span>
-              <button
-                mat-icon-button
-                (click)="clearHistory(); $event.stopPropagation()"
-                aria-label="Clear History"
-                title="Clear History"
+
+          <!-- History Dropdown -->
+          <div class="word-definition__history-container">
+            <button
+              class="geist-btn geist-btn--icon"
+              (click)="toggleHistory()"
+              (keydown.escape)="historyOpen.set(false)"
+              aria-label="Search History"
+              title="Search History"
+              [attr.aria-expanded]="historyOpen()"
+              aria-haspopup="listbox"
+              [disabled]="searchHistory().length === 0"
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
               >
-                <mat-icon>delete_sweep</mat-icon>
-              </button>
-            </div>
-            <mat-divider></mat-divider>
-            @for (word of searchHistory(); track word) {
-              <button mat-menu-item (click)="onSearch(word)">
-                <mat-icon>history</mat-icon>
-                <span>{{ word }}</span>
-              </button>
+                <path d="M3 3v5h5"></path>
+                <path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"></path>
+                <path d="M12 8v4l3 3"></path>
+              </svg>
+            </button>
+
+            @if (historyOpen()) {
+              <div class="word-definition__history-menu" role="listbox">
+                <div class="word-definition__history-header">
+                  <span>Search History</span>
+                  <button
+                    class="geist-btn geist-btn--icon word-definition__history-clear"
+                    (click)="clearHistory(); $event.stopPropagation()"
+                    (keydown.escape)="historyOpen.set(false)"
+                    aria-label="Clear History"
+                    title="Clear History"
+                  >
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      aria-hidden="true"
+                    >
+                      <polyline points="3 6 5 6 21 6"></polyline>
+                      <path
+                        d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                      ></path>
+                      <line x1="10" y1="11" x2="10" y2="17"></line>
+                      <line x1="14" y1="11" x2="14" y2="17"></line>
+                    </svg>
+                  </button>
+                </div>
+                <div class="word-definition__history-list">
+                  @for (word of searchHistory(); track word) {
+                    <button
+                      class="word-definition__history-item"
+                      role="option"
+                      aria-selected="false"
+                      (click)="onSearch(word)"
+                      (keydown.escape)="historyOpen.set(false)"
+                    >
+                      <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        aria-hidden="true"
+                      >
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                      </svg>
+                      <span>{{ word }}</span>
+                    </button>
+                  }
+                </div>
+              </div>
+              <!-- Backdrop to close menu -->
+              <div
+                class="word-definition__backdrop"
+                (click)="historyOpen.set(false)"
+                aria-hidden="true"
+              ></div>
             }
-          </mat-menu>
+          </div>
         </div>
-      </mat-card-content>
-    </mat-card>
+      </div>
+    </div>
   </div>
 
   <div class="word-definition__results">
     @if (isLoading()) {
       <div class="word-definition__state word-definition__state--loading">
-        <mat-spinner diameter="50"></mat-spinner>
+        <div class="geist-spinner geist-spinner--large"></div>
         <p>Analyzing word nuance...</p>
       </div>
     } @else if (error()) {
       <div class="word-definition__state word-definition__state--error">
-        <mat-icon color="warn">error</mat-icon>
+        <svg
+          width="32"
+          height="32"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="var(--geist-error)"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
         <p>{{ error() }}</p>
       </div>
     } @else if (definition()) {
-      <mat-card class="word-definition__definition-card">
-        <mat-card-content>
-          <div class="word-definition__markdown-content" [innerHTML]="definition()"></div>
-        </mat-card-content>
-      </mat-card>
+      <div class="geist-card word-definition__definition-card">
+        <div class="word-definition__markdown-content" [innerHTML]="definition()"></div>
+      </div>
     } @else {
       <div class="word-definition__state word-definition__state--empty">
-        <mat-icon class="word-definition__state-icon">school</mat-icon>
+        <svg
+          class="word-definition__state-icon"
+          width="48"
+          height="48"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+          <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+        </svg>
         <p>Enter a word to start learning.</p>
       </div>
     }

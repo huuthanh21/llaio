@@ -8,7 +8,6 @@ import {
   signal,
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { MatSidenavModule } from '@angular/material/sidenav';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter, map } from 'rxjs/operators';
 import { SidebarComponent } from '../sidebar/sidebar.component';
@@ -16,7 +15,7 @@ import { TopBarComponent } from '../top-bar/top-bar.component';
 
 @Component({
   selector: 'app-main-layout',
-  imports: [RouterOutlet, MatSidenavModule, TopBarComponent, SidebarComponent],
+  imports: [RouterOutlet, TopBarComponent, SidebarComponent],
   templateUrl: './main-layout.component.html',
   styleUrl: './main-layout.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

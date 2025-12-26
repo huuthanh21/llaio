@@ -90,9 +90,3 @@ You are an expert in TypeScript, Angular 21, and scalable web application develo
 - **Typography**: Inter font family.
 - **Global Styles**: Defined in `styles.scss` (includes Material core, Bootstrap grid).
 - **Variables**: `src/styles/_variables.scss` for colors/spacing.
-
-### Key Rules
-
-- **Components**: Standalone, `OnPush` change detection, Signals for local state.
-- **Forms**: Reactive Forms preferred.
-- **Control Flow**: New Angular `@if`, `@for` syntax.
