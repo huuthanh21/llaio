@@ -5,11 +5,15 @@
 
 .sidebar-nav {
   padding: 12px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 
   &__list {
     list-style: none;
     margin: 0;
     padding: 0;
+    flex: 1;
   }
 
   &__link {
@@ -24,6 +28,15 @@
     color: var(--accents-5);
     text-decoration: none;
     transition: all 0.15s ease;
+    cursor: pointer;
+
+    &--button {
+      background: none;
+      border: none;
+      width: 100%;
+      text-align: left;
+      font-family: inherit;
+    }
 
     &:hover {
       background: var(--accents-2);
@@ -33,6 +46,30 @@
     &--active {
       background: var(--geist-foreground) !important;
       color: var(--geist-background) !important;
+    }
+  }
+
+  &__settings-btn {
+    display: flex;
+    align-items: center;
+    height: 40px;
+    padding: 0 12px;
+    width: 100%;
+    margin-bottom: 4px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--accents-5);
+    background: none;
+    border: none;
+    text-align: left;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.15s ease;
+
+    &:hover {
+      background: var(--accents-1);
+      color: var(--geist-foreground);
     }
   }
 

@@ -18,4 +18,9 @@
   @if (sidebarOpen()) {
     <div class="main-layout__overlay" (click)="toggleSidebar()" aria-hidden="true"></div>
   }
+
+  <app-settings-modal
+    [isOpen]="settingsStore.isModalOpen()"
+    (closeModal)="settingsStore.closeModal()"
+  />
 </div>

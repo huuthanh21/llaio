@@ -7,6 +7,11 @@ export const routes: Routes = [
     component: MainLayoutComponent,
     children: [
       {
+        path: '',
+        redirectTo: 'lookup',
+        pathMatch: 'full',
+      },
+      {
         path: 'lookup',
         loadComponent: () =>
           import('./features/word-definition/word-definition.component').then(
@@ -14,5 +19,9 @@ export const routes: Routes = [
           ),
       },
     ],
+  },
+  {
+    path: '**',
+    redirectTo: '/lookup',
   },
 ];

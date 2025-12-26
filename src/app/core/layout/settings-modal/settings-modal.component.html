@@ -1,0 +1,60 @@
+@if (isOpen()) {
+  <div class="settings-modal__backdrop" (click)="closeModal.emit()" aria-hidden="true"></div>
+  <div
+    class="geist-card settings-modal__dialog"
+    role="dialog"
+    aria-labelledby="settings-title"
+    aria-modal="true"
+    cdkTrapFocus
+    cdkTrapFocusAutoCapture
+    (keydown.escape)="closeModal.emit()"
+  >
+    <div class="settings-modal__header">
+      <h2 id="settings-title">Settings</h2>
+      <button
+        class="geist-btn geist-btn--icon settings-modal__close-btn"
+        (click)="closeModal.emit()"
+        aria-label="Close settings"
+      >
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <div class="settings-modal__content">
+      <div class="settings-modal__group">
+        <label class="geist-label" for="api-key">Gemini API Key</label>
+        <div class="settings-modal__input-wrapper">
+          <input
+            id="api-key"
+            type="password"
+            class="geist-input"
+            [formControl]="apiKeyControl"
+            placeholder="Enter your API key"
+            autocomplete="off"
+            spellcheck="false"
+          />
+        </div>
+        <p class="settings-modal__hint">
+          Your key is stored locally and never sent to our servers.
+        </p>
+      </div>
+    </div>
+
+    <div class="settings-modal__actions">
+      <button class="geist-btn geist-btn--primary" (click)="onSave()">Save</button>
+    </div>
+  </div>
+}

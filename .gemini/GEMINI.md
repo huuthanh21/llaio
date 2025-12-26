@@ -67,8 +67,7 @@ You are an expert in TypeScript, Angular 21, and scalable web application develo
 
 - **Framework**: Angular 21 (Standalone Components)
 - **State Management**: @ngrx/signals (Global Signal Stores)
-- **UI Library**: Angular Material 21 (M2 Theme), Bootstrap 5.3 (Grid/Utilities)
-- **Styles**: SCSS, BEM, Custom Properties
+- **Styles**: SCSS, BEM, Geist Design System
 - **Build**: Vite/Esbuild (Angular CLI default)
 
 ### Architecture
@@ -86,7 +85,7 @@ You are an expert in TypeScript, Angular 21, and scalable web application develo
 
 ### Styling & Design
 
-- **Theme**: Custom Angular Material theme (M2) with primary (Indigo) and accent (Pink) palettes.
+- **Theme**: Geist Design System
 - **Typography**: Inter font family.
-- **Global Styles**: Defined in `styles.scss` (includes Material core, Bootstrap grid).
-- **Variables**: `src/styles/_variables.scss` for colors/spacing.
+- **Global Styles**: Defined in `styles.scss`.
+- **Variables**: `src/styles.scss`.
