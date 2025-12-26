@@ -1,7 +1,8 @@
 import { inject, Injectable } from '@angular/core';
 import { GoogleGenAI } from '@google/genai';
 import { Observable } from 'rxjs';
-import { GEMINI_CONFIG } from '../configs/gemini.config';
+import { getSystemInstruction } from '../configs/gemini.config';
+import { LanguageStore } from '../stores/language.store';
 import { SettingsStore } from '../stores/settings.store';
 
 @Injectable({
@@ -9,6 +10,8 @@ import { SettingsStore } from '../stores/settings.store';
 })
 export class GeminiService {
   private readonly settingsStore = inject(SettingsStore);
+
+  private readonly languageStore = inject(LanguageStore);
 
   public generateDefinition(word: string): Observable<string> {
     return new Observable<string>((observer) => {
@@ -20,7 +23,10 @@ export class GeminiService {
       }
 
       const genAI = new GoogleGenAI({ apiKey });
-      const { model, config } = GEMINI_CONFIG;
+      const { model, config } = getSystemInstruction(
+        this.languageStore.targetLanguage(),
+        this.languageStore.nativeLanguage(),
+      );
 
       genAI.models
         .generateContentStream({

@@ -1,0 +1,105 @@
+.dropdown {
+  position: relative;
+  display: inline-block;
+
+  &--full {
+    display: block;
+    width: 100%;
+  }
+
+  &__trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+
+    &--full {
+      width: 100%;
+      background: var(--geist-background);
+      border: 1px solid var(--accents-2);
+      color: var(--geist-foreground);
+      font-weight: normal;
+
+      &:hover:not(:disabled) {
+        border-color: var(--geist-foreground);
+      }
+    }
+  }
+
+  &__icon {
+    color: var(--accents-5);
+    transition: transform 0.2s ease;
+  }
+
+  &.active &__icon {
+    transform: rotate(180deg);
+  }
+
+  &__menu {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    min-width: 180px;
+    width: 100%; /* Match trigger width if needed */
+    background: var(--geist-background);
+    border: 1px solid var(--accents-2);
+    border-radius: var(--radius-md);
+    padding: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    max-height: 300px;
+    overflow-y: auto;
+
+    /* Animation */
+    animation: dropdown-fade-in 0.15s ease-out;
+  }
+
+  &--right &__menu {
+    left: auto;
+    right: 0;
+  }
+
+  &__item {
+    display: block;
+    width: 100%;
+    padding: 8px 12px;
+    text-align: left;
+    background: none;
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--geist-foreground);
+    transition: all 0.15s ease;
+
+    &:hover {
+      background: var(--accents-1);
+    }
+
+    &[aria-selected='true'] {
+      background: var(--geist-success);
+      color: #fff;
+    }
+  }
+
+  &__backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 999;
+    cursor: default;
+  }
+}
+
+@keyframes dropdown-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

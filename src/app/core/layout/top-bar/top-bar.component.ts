@@ -1,16 +1,10 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  EventEmitter,
-  inject,
-  Output,
-  signal,
-} from '@angular/core';
-import { Language, LanguageStore } from '../../stores/language.store';
+import { ChangeDetectionStrategy, Component, EventEmitter, inject, Output } from '@angular/core';
+import { DropdownComponent } from '../../../shared/components/dropdown/dropdown.component';
+import { Language, LANGUAGES, LanguageStore } from '../../stores/language.store';
 
 @Component({
   selector: 'app-top-bar',
-  imports: [],
+  imports: [DropdownComponent],
   templateUrl: './top-bar.component.html',
   styleUrl: './top-bar.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -20,18 +14,5 @@ export class TopBarComponent {
 
   protected readonly store = inject(LanguageStore);
 
-  protected menuOpen = signal(false);
-
-  protected languages: Language[] = [
-    'Spanish',
-    'French',
-    'German',
-    'Japanese',
-    'Italian',
-    'Chinese',
-  ];
-
-  protected toggleMenu(): void {
-    this.menuOpen.update((v) => !v);
-  }
+  protected languages: Language[] = LANGUAGES;
 }

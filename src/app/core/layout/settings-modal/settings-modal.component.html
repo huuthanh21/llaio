@@ -35,7 +35,7 @@
 
     <div class="settings-modal__content">
       <div class="settings-modal__group">
-        <label class="geist-label" for="api-key">Gemini API Key</label>
+        <label class="geist-label settings-modal__input-label" for="api-key">Gemini API Key</label>
         <div class="settings-modal__input-wrapper">
           <input
             id="api-key"
@@ -50,6 +50,21 @@
         <p class="settings-modal__hint">
           Your key is stored locally and never sent to our servers.
         </p>
+      </div>
+
+      <div class="settings-modal__group">
+        <label class="geist-label settings-modal__input-label" for="native-lang"
+          >Native Language</label
+        >
+        <div class="settings-modal__input-wrapper">
+          <app-dropdown
+            [options]="languages"
+            [formControl]="nativeLanguageControl"
+            variant="full"
+            align="left"
+          />
+        </div>
+        <p class="settings-modal__hint">Translations and explanations will be in this language.</p>
       </div>
     </div>
 
