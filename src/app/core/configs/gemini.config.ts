@@ -2,7 +2,6 @@ import { ThinkingLevel } from '@google/genai';
 import { GeminiConfig } from '../models/gemini.model';
 
 export const GEMINI_CONFIG: GeminiConfig = {
-  apiKey: import.meta.env.NG_APP_GEMINI_API_KEY ?? '',
   model: 'gemini-3-flash-preview',
   config: {
     thinkingConfig: {

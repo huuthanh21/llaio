@@ -10,12 +10,14 @@ import {
 import { toSignal } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter, map } from 'rxjs/operators';
+import { SettingsStore } from '../../stores/settings.store';
+import { SettingsModalComponent } from '../settings-modal/settings-modal.component';
 import { SidebarComponent } from '../sidebar/sidebar.component';
 import { TopBarComponent } from '../top-bar/top-bar.component';
 
 @Component({
   selector: 'app-main-layout',
-  imports: [RouterOutlet, TopBarComponent, SidebarComponent],
+  imports: [RouterOutlet, TopBarComponent, SidebarComponent, SettingsModalComponent],
   templateUrl: './main-layout.component.html',
   styleUrl: './main-layout.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -24,6 +26,8 @@ export class MainLayoutComponent {
   private readonly breakpointObserver = inject(BreakpointObserver);
 
   private readonly router = inject(Router);
+
+  protected readonly settingsStore = inject(SettingsStore);
 
   // Detect mobile breakpoint (max-width: 768px)
   protected readonly isMobile = toSignal(

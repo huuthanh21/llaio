@@ -27,7 +27,11 @@
     }
   }
 
-  /* Open state logic for mobile */
+  &__sidebar-content {
+    flex: 1;
+    height: 100%;
+    overflow: hidden;
+  }
   &--sidebar-open .main-layout__sidebar {
     transform: translateX(0);
   }
