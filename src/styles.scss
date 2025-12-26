@@ -168,6 +168,48 @@ p {
   }
 }
 
+/* Selects */
+.geist-select-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.geist-select {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+  height: 40px;
+  padding: 0 12px;
+  padding-right: 32px; /* Space for icon */
+  border-radius: var(--radius-md);
+  border: 1px solid var(--accents-2);
+  background: var(--geist-background);
+  color: var(--geist-foreground);
+  font-size: 14px;
+  font-family: inherit;
+  transition: border-color 0.15s ease;
+  outline: none;
+  cursor: pointer;
+
+  &:focus {
+    border-color: var(--geist-foreground);
+  }
+
+  &--large {
+    height: 48px;
+    font-size: 16px;
+  }
+}
+
+.geist-select-icon {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: var(--accents-5);
+}
+
 /* Loading Spinner */
 .geist-spinner {
   width: 20px;

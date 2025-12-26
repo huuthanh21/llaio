@@ -1,0 +1,49 @@
+<div
+  class="dropdown"
+  [class.dropdown--full]="variant === 'full'"
+  [class.dropdown--right]="align === 'right'"
+  [class.active]="isOpen()"
+>
+  <button
+    type="button"
+    class="geist-btn dropdown__trigger"
+    [class.geist-btn--secondary]="variant === 'default'"
+    [class.dropdown__trigger--full]="variant === 'full'"
+    [disabled]="disabled()"
+    (click)="toggleDropdown()"
+    [attr.aria-expanded]="isOpen()"
+    aria-haspopup="listbox"
+  >
+    <span class="dropdown__value">{{ selectedValue() }}</span>
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      class="dropdown__icon"
+    >
+      <path d="M6 9l6 6 6-6" />
+    </svg>
+  </button>
+
+  @if (isOpen()) {
+    <div class="dropdown__menu" role="listbox">
+      @for (option of options; track option) {
+        <button
+          type="button"
+          class="dropdown__item"
+          role="option"
+          [attr.aria-selected]="selectedValue() === option"
+          (click)="selectOption(option)"
+        >
+          {{ option }}
+        </button>
+      }
+    </div>
+    <div class="dropdown__backdrop" (click)="closeDropdown()" aria-hidden="true"></div>
+  }
+</div>

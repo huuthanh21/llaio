@@ -26,51 +26,10 @@
   <div class="top-bar__spacer"></div>
 
   <!-- Language Dropdown -->
-  <div class="top-bar__dropdown-container">
-    <button
-      class="geist-btn geist-btn--secondary top-bar__lang-btn"
-      (click)="toggleMenu()"
-      (keydown.escape)="menuOpen.set(false)"
-      [class.active]="menuOpen()"
-      [attr.aria-expanded]="menuOpen()"
-      aria-haspopup="listbox"
-    >
-      <span>{{ store.targetLanguage() }}</span>
-      <svg
-        width="16"
-        height="16"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        aria-hidden="true"
-      >
-        <path d="M6 9l6 6 6-6" />
-      </svg>
-    </button>
-
-    @if (menuOpen()) {
-      <div class="top-bar__dropdown-menu" role="listbox">
-        @for (lang of languages; track lang) {
-          <button
-            class="top-bar__dropdown-item"
-            role="option"
-            [attr.aria-selected]="store.targetLanguage() === lang"
-            (click)="store.setLanguage(lang); menuOpen.set(false)"
-            (keydown.escape)="menuOpen.set(false)"
-          >
-            {{ lang }}
-          </button>
-        }
-      </div>
-      <!-- Backdrop to close menu -->
-      <div
-        class="top-bar__dropdown-backdrop"
-        (click)="menuOpen.set(false)"
-        aria-hidden="true"
-      ></div>
-    }
-  </div>
+  <app-dropdown
+    [options]="languages"
+    [value]="store.targetLanguage()"
+    (valueChange)="store.setLanguage($any($event))"
+    align="right"
+  />
 </header>
