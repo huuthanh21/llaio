@@ -52,7 +52,7 @@ export class WordDefinitionComponent {
 
     this.geminiService.generateDefinition(searchTerm).subscribe({
       next: async (result) => {
-        const parsed = await marked.parse(result);
+        const parsed = await marked.parse(result, { breaks: true });
         this.definition.set(parsed);
         // Save response to history for future lookups
         this.wordHistoryService.addToHistory(searchTerm, parsed);
