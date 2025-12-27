@@ -23,29 +23,17 @@
     padding: 0 12px;
     margin-bottom: 4px;
     border-radius: 6px;
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--accents-5);
     text-decoration: none;
     transition: all 0.15s ease;
     cursor: pointer;
 
-    &--button {
-      background: none;
-      border: none;
-      width: 100%;
-      text-align: left;
-      font-family: inherit;
-    }
-
-    &:hover {
-      background: var(--accents-2);
-      color: var(--geist-foreground);
+    &:hover:not(&--active) {
+      background: var(--bg-dark-2);
     }
 
     &--active {
-      background: var(--geist-foreground) !important;
-      color: var(--geist-background) !important;
+      background: var(--bg-dark-3);
+      color: var(--text-color);
     }
   }
 
@@ -57,9 +45,7 @@
     width: 100%;
     margin-bottom: 4px;
     border-radius: 6px;
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--accents-5);
+    color: var(--text-color-light);
     background: none;
     border: none;
     text-align: left;
@@ -68,8 +54,8 @@
     transition: all 0.15s ease;
 
     &:hover {
-      background: var(--accents-1);
-      color: var(--geist-foreground);
+      background: var(--bg-dark-2);
+      color: var(--text-color);
     }
   }
 

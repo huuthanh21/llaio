@@ -1,13 +1,13 @@
 <div class="word-definition">
   <div class="word-definition__header">
-    <div class="geist-card">
+    <div class="card">
       <div class="word-definition__search-content">
         <div class="word-definition__input-group">
-          <label class="geist-label" for="word-search">Enter a word</label>
+          <label class="text-label-14" for="word-search">Enter a word</label>
           <div class="word-definition__input-wrapper">
             <input
               id="word-search"
-              class="geist-input geist-input--large"
+              class="input input--large text-label-14"
               [formControl]="searchControl"
               (keyup.enter)="onSearch()"
               placeholder="e.g. Serendipity"
@@ -15,7 +15,7 @@
             />
             @if (searchControl.value) {
               <button
-                class="geist-btn geist-btn--icon word-definition__clear-btn"
+                class="btn btn--icon word-definition__clear-btn"
                 aria-label="Clear"
                 (click)="searchControl.setValue('')"
               >
@@ -39,29 +39,23 @@
 
         <div class="word-definition__actions">
           <button
-            class="geist-btn geist-btn--primary"
+            class="btn btn--contrast"
             (click)="onSearch()"
             [disabled]="isLoading() || !searchControl.value"
           >
             @if (isLoading()) {
-              <div class="geist-spinner"></div>
+              <div class="spinner"></div>
             } @else {
               Define
             }
           </button>
 
-          <button
-            class="geist-btn geist-btn--secondary"
-            (click)="onReset()"
-            [disabled]="isLoading()"
-          >
-            Reset
-          </button>
+          <button class="btn btn--light" (click)="onReset()" [disabled]="isLoading()">Reset</button>
 
           <!-- History Dropdown -->
           <div class="word-definition__history-container">
             <button
-              class="geist-btn geist-btn--icon"
+              class="btn btn--icon"
               (click)="toggleHistory()"
               (keydown.escape)="historyOpen.set(false)"
               aria-label="Search History"
@@ -92,7 +86,7 @@
                 <div class="word-definition__history-header">
                   <span>Search History</span>
                   <button
-                    class="geist-btn geist-btn--icon word-definition__history-clear"
+                    class="btn btn--icon word-definition__history-clear"
                     (click)="clearHistory(); $event.stopPropagation()"
                     (keydown.escape)="historyOpen.set(false)"
                     aria-label="Clear History"
@@ -161,18 +155,18 @@
 
   <div class="word-definition__results">
     @if (isLoading()) {
-      <div class="word-definition__state word-definition__state--loading">
-        <div class="geist-spinner geist-spinner--large"></div>
+      <div class="word-definition__state word-definition__state--loading text-label-14">
+        <div class="spinner spinner--large"></div>
         <p>Analyzing word nuance...</p>
       </div>
     } @else if (error()) {
-      <div class="word-definition__state word-definition__state--error">
+      <div class="word-definition__state word-definition__state--error text-label-14">
         <svg
           width="32"
           height="32"
           viewBox="0 0 24 24"
           fill="none"
-          stroke="var(--geist-error)"
+          stroke="var(--bg-error)"
           stroke-width="2"
           stroke-linecap="round"
           stroke-linejoin="round"
@@ -184,13 +178,12 @@
         <p>{{ error() }}</p>
       </div>
     } @else if (definition()) {
-      <div class="geist-card word-definition__definition-card">
+      <div class="card word-definition__definition-card">
         <div class="word-definition__markdown-content" [innerHTML]="definition()"></div>
       </div>
     } @else {
-      <div class="word-definition__state word-definition__state--empty">
+      <div class="word-definition__state word-definition__state--empty text-label-14">
         <svg
-          class="word-definition__state-icon"
           width="48"
           height="48"
           viewBox="0 0 24 24"

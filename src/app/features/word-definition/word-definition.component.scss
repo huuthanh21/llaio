@@ -24,6 +24,7 @@
     position: relative;
     display: flex;
     align-items: center;
+    margin-top: 4px;
   }
 
   &__clear-btn {
@@ -31,11 +32,11 @@
     right: 8px;
     height: 32px;
     width: 32px;
-    color: var(--accents-4);
+    background-color: transparent;
+    color: var(--text-color-light);
 
     &:hover {
-      color: var(--geist-foreground);
-      background: var(--accents-1);
+      background: var(--bg-dark-1);
     }
   }
 
@@ -55,9 +56,9 @@
     top: calc(100% + 8px);
     right: 0;
     width: 280px;
-    background: var(--geist-background);
-    border: 1px solid var(--accents-2);
-    border-radius: 12px;
+    background: var(--bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     z-index: 50;
     overflow: hidden;
@@ -68,19 +69,19 @@
     justify-content: space-between;
     align-items: center;
     padding: 12px 16px;
-    border-bottom: 1px solid var(--accents-2);
+    border-bottom: 1px solid var(--border-color);
     font-size: 13px;
     font-weight: 500;
-    background: var(--accents-1);
-    color: var(--accents-5);
+    background: var(--bg-dark-1);
+    color: var(--text-color-light);
   }
 
   &__history-clear {
     height: 28px;
     width: 28px;
-    color: var(--accents-5);
+    color: var(--text-color-light);
     &:hover {
-      color: var(--geist-error);
+      color: var(--bg-error);
     }
   }
 
@@ -102,15 +103,15 @@
     cursor: pointer;
     font-size: 14px;
     text-align: left;
-    color: var(--geist-foreground);
+    color: var(--text-color);
     transition: background-color 0.15s ease;
 
     &:hover {
-      background: var(--accents-1);
+      background: var(--bg-dark-1);
     }
 
     svg {
-      color: var(--accents-4);
+      color: var(--text-color-light);
       width: 16px;
       height: 16px;
     }
@@ -129,16 +130,11 @@
     align-items: center;
     justify-content: center;
     padding: 48px 0;
-    color: var(--accents-5);
     text-align: center;
     gap: 16px;
 
-    &--error {
-      color: var(--geist-error);
-    }
-
-    &-icon {
-      color: var(--accents-3);
+    &--error * {
+      color: var(--bg-error);
     }
   }
 
@@ -152,7 +148,7 @@
     }
     ::ng-deep p {
       margin-bottom: 1rem;
-      color: var(--geist-foreground);
+      color: var(--text-color);
     }
   }
 }

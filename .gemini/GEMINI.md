@@ -86,6 +86,6 @@ You are an expert in TypeScript, Angular 21, and scalable web application develo
 ### Styling & Design
 
 - **Theme**: Geist Design System
-- **Typography**: Inter font family.
+- **Typography**: Geise font family. See `src/styles/typography.scss` for variables.
 - **Global Styles**: Defined in `styles.scss`.
 - **Variables**: `src/styles.scss`.

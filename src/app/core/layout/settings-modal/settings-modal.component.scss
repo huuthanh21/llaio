@@ -16,11 +16,11 @@
     transform: translate(-50%, -50%);
     width: 90%;
     max-width: 400px;
+    max-height: 90vh;
     z-index: 101;
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
-    /* padding is handled by .geist-card */
   }
 
   &__header {
@@ -40,17 +40,10 @@
   &__group {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
   }
 
-  &__input-label[for='native-lang'] {
-    margin-top: 1rem;
-  }
-
-  &__hint {
-    margin: 0;
-    font-size: 0.75rem;
-    color: var(--accents-5);
+  &__group:not(:last-child) {
+    margin-bottom: 1rem;
   }
 
   &__actions {
