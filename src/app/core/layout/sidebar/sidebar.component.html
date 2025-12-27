@@ -6,7 +6,7 @@
           [routerLink]="item.route"
           routerLinkActive="sidebar-nav__link--active"
           [routerLinkActiveOptions]="{ exact: item.route === '/' }"
-          class="sidebar-nav__link"
+          class="sidebar-nav__link text-label-14"
         >
           <span class="sidebar-nav__icon">
             @if (item.icon === 'translate') {
@@ -50,7 +50,7 @@
   </ul>
 
   <div class="sidebar-nav__footer">
-    <button type="button" class="sidebar-nav__settings-btn" (click)="openSettings()">
+    <button type="button" class="sidebar-nav__settings-btn text-button-14" (click)="openSettings()">
       <span class="sidebar-nav__icon">
         <svg
           width="20"

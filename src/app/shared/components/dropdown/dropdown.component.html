@@ -5,16 +5,34 @@
   [class.active]="isOpen()"
 >
   <button
+    #triggerBtn
     type="button"
-    class="geist-btn dropdown__trigger"
-    [class.geist-btn--secondary]="variant === 'default'"
+    class="btn dropdown__trigger text-button-14"
     [class.dropdown__trigger--full]="variant === 'full'"
     [disabled]="disabled()"
     (click)="toggleDropdown()"
     [attr.aria-expanded]="isOpen()"
     aria-haspopup="listbox"
   >
-    <span class="dropdown__value">{{ selectedValue() }}</span>
+    <span class="dropdown__value">
+      @if (selectedOption()?.icon) {
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="dropdown__item-icon"
+          aria-hidden="true"
+        >
+          <path [attr.d]="selectedOption()!.icon" />
+        </svg>
+      }
+      {{ selectedOption()?.label }}
+    </span>
     <svg
       width="16"
       height="16"
@@ -24,23 +42,39 @@
       stroke-width="2"
       stroke-linecap="round"
       stroke-linejoin="round"
-      class="dropdown__icon"
+      class="dropdown__chevron"
     >
       <path d="M6 9l6 6 6-6" />
     </svg>
   </button>
 
   @if (isOpen()) {
-    <div class="dropdown__menu" role="listbox">
-      @for (option of options; track option) {
+    <div class="dropdown__menu" role="listbox" [style.max-height]="menuMaxHeight()">
+      @for (option of normalizedOptions(); track option.value) {
         <button
           type="button"
-          class="dropdown__item"
+          class="dropdown__item text-label-14"
           role="option"
-          [attr.aria-selected]="selectedValue() === option"
-          (click)="selectOption(option)"
+          [attr.aria-selected]="selectedValue() === option.value"
+          (click)="selectOption(option.value)"
         >
-          {{ option }}
+          @if (option.icon) {
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="dropdown__item-icon"
+              aria-hidden="true"
+            >
+              <path [attr.d]="option.icon" />
+            </svg>
+          }
+          <span class="dropdown__item-label">{{ option.label }}</span>
         </button>
       }
     </div>

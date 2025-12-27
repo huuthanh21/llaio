@@ -12,27 +12,36 @@
     align-items: center;
     justify-content: space-between;
     gap: 8px;
+    background: var(--bg);
+    border: 1px solid var(--border-color);
+
+    &:hover:not(:disabled) {
+      background: var(--bg-dark-1);
+      border-color: var(--bg-dark-2);
+    }
 
     &--full {
       width: 100%;
-      background: var(--geist-background);
-      border: 1px solid var(--accents-2);
-      color: var(--geist-foreground);
-      font-weight: normal;
-
-      &:hover:not(:disabled) {
-        border-color: var(--geist-foreground);
-      }
     }
   }
 
-  &__icon {
-    color: var(--accents-5);
-    transition: transform 0.2s ease;
+  &__value {
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
 
-  &.active &__icon {
+  &__chevron {
+    transition: transform 0.2s ease;
+    flex-shrink: 0;
+  }
+
+  &.active &__chevron {
     transform: rotate(180deg);
+  }
+
+  &__item-icon {
+    flex-shrink: 0;
   }
 
   &__menu {
@@ -41,14 +50,15 @@
     left: 0;
     min-width: 180px;
     width: 100%; /* Match trigger width if needed */
-    background: var(--geist-background);
-    border: 1px solid var(--accents-2);
+    background: var(--bg);
+    border: 1px solid var(--border-color);
     border-radius: var(--radius-md);
     padding: 4px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     z-index: 1000;
-    max-height: 300px;
+
     overflow-y: auto;
+    overscroll-behavior: contain;
 
     /* Animation */
     animation: dropdown-fade-in 0.15s ease-out;
@@ -60,25 +70,27 @@
   }
 
   &__item {
-    display: block;
+    display: flex;
+    align-items: center;
+    gap: 8px;
     width: 100%;
-    padding: 8px 12px;
+    padding: 6px 12px;
+    margin: 2px 0;
     text-align: left;
     background: none;
     border: none;
     border-radius: var(--radius-sm);
     cursor: pointer;
-    font-size: 14px;
-    color: var(--geist-foreground);
+    color: var(--text-color-light);
     transition: all 0.15s ease;
 
     &:hover {
-      background: var(--accents-1);
+      background: var(--bg-dark-2);
     }
 
     &[aria-selected='true'] {
-      background: var(--geist-success);
-      color: #fff;
+      background: var(--bg-dark-3);
+      color: var(--text-color);
     }
   }
 
