@@ -17,6 +17,20 @@
     <link rel="manifest" href="manifest.webmanifest" />
   </head>
   <body>
+    <!-- Genanki Dependencies -->
+    <script src="libs/genanki/sql.js"></script>
+    <script src="libs/genanki/FileSaver.min.js"></script>
+    <script src="libs/genanki/jszip.min.js"></script>
+    <script src="libs/genanki/genanki.js"></script>
+    <script>
+      var config = {
+        locateFile: (filename) => `libs/genanki/${filename}`,
+      };
+      var SQL;
+      initSqlJs(config).then(function (sql) {
+        SQL = sql;
+      });
+    </script>
     <app-root></app-root>
     <noscript>Please enable JavaScript to continue using this application.</noscript>
   </body>

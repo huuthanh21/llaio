@@ -41,20 +41,17 @@ export class MainLayoutComponent {
 
   public constructor() {
     // specific effect to react to mobile state changes
-    effect(
-      () => {
-        const mobile = this.isMobile();
-        // On mobile, default to closed. On desktop, default to open.
-        // We use allowSignalWrites because we are updating a signal inside an effect.
-        // However, typical pattern is to just set it.
-        if (mobile) {
-          this.sidebarOpen.set(false);
-        } else {
-          this.sidebarOpen.set(true);
-        }
-      },
-      { allowSignalWrites: true },
-    );
+    effect(() => {
+      const mobile = this.isMobile();
+      // On mobile, default to closed. On desktop, default to open.
+      // We use allowSignalWrites because we are updating a signal inside an effect.
+      // However, typical pattern is to just set it.
+      if (mobile) {
+        this.sidebarOpen.set(false);
+      } else {
+        this.sidebarOpen.set(true);
+      }
+    });
 
     // Close sidebar on navigation if on mobile
     this.router.events.pipe(filter((event) => event instanceof NavigationEnd)).subscribe(() => {
