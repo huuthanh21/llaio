@@ -26,7 +26,6 @@
     "@fontsource-variable/geist-mono": "^5.2.7",
     "@google/genai": "^1.34.0",
     "@ngrx/signals": "^21.0.1",
-    "bootstrap": "^5.3.8",
     "marked": "^17.0.1",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"
