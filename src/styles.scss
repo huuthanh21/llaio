@@ -147,3 +147,20 @@
     oklch(from var(--border) l c h / calc(alpha + 0.15))
   );
 }
+
+/* Streaming Cursor Animation */
+.streaming-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  background-color: var(--foreground);
+  margin-left: 2px;
+  vertical-align: text-bottom;
+  animation: blink 0.7s steps(2, start) infinite;
+}
+
+@keyframes blink {
+  to {
+    opacity: 0;
+  }
+}

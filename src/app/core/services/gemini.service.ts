@@ -47,11 +47,8 @@ export class GeminiService {
           for await (const chunk of response) {
             const chunkText = chunk.text || '';
             fullText += chunkText;
-            // Optionally emit partial updates here if we want streaming UI later
-            // observer.next(fullText);
+            observer.next(fullText);
           }
-          // For now, emit the full text at the end to match current behavior
-          observer.next(fullText);
           observer.complete();
         })
         .catch((err: unknown) => {

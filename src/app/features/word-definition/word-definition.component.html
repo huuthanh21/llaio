@@ -118,6 +118,9 @@
         class="prose [--tw-prose-body:var(--foreground)] [--tw-prose-bold:var(--foreground)] dark:prose-invert prose-headings:text-heading-24 prose-headings:leading-[inherit] prose-p:text-copy-16 prose-p:leading-[inherit] prose-strong:text-foreground prose-li:text-label-16 prose-li:leading-[inherit]"
         [innerHTML]="definition()"
       ></article>
+      @if (isStreaming()) {
+        <span class="streaming-cursor" aria-hidden="true"></span>
+      }
     </div>
   </app-content-status>
 </div>
