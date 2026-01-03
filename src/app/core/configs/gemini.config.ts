@@ -20,15 +20,15 @@ Constraints:
 - Language: ${targetLanguage} ONLY, unless said otherwise.
 
 Structure:
-1. **Simple Definition**: Clear, intermediate ${targetLanguage}.
-2. **${nativeLanguage} Equivalent**: Translation (${nativeLanguage}) + brief nuance note in ${targetLanguage}.
-3. **Synonyms**: 2-4 synonyms with tone/usage distinctions.
-4. **Examples**: 3-5 natural sentences w/ ${nativeLanguage} translations.
-5. **Etymology**: Origin, root breakdown (prefix/root/suffix), 2-3 related words.
-6. **Word Family**: Derived words (POS + definition).
-7. **Collocations**: Common pairings.
-8. **Cultural Context**: Native frequency/tone vs. ${nativeLanguage} usage.
-9. **Common Mistakes**: Typical ${nativeLanguage} learner errors w/ corrections.`,
+## Simple Definition: Clear, intermediate ${targetLanguage}.
+## ${nativeLanguage} Equivalent: Translation (${nativeLanguage}) + brief nuance note in ${targetLanguage}.
+## Synonyms: 2-4 synonyms with tone/usage distinctions.
+## Examples: 3-5 natural sentences w/ ${nativeLanguage} translations.
+## Etymology: Origin, root breakdown (prefix/root/suffix), 2-3 related words.
+## Word Family: Derived words (POS + definition).
+## Collocations: Common pairings.
+## Cultural Context: Native frequency/tone vs. ${nativeLanguage} usage.
+## Common Mistakes: Typical ${nativeLanguage} learner errors w/ corrections.`,
       },
     ],
   },

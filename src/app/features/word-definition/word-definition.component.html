@@ -1,148 +1,107 @@
-<div class="word-definition">
-  <div class="word-definition__header">
-    <div class="card">
-      <div class="word-definition__search-content">
-        <div class="word-definition__input-group">
+<div class="mx-auto flex max-w-200 flex-col gap-6">
+  <div class="w-full">
+    <div class="relative rounded-lg border border-border bg-background p-6 shadow-sm">
+      <div class="flex flex-col gap-4">
+        <div class="flex flex-col">
           <label class="text-label-14" for="word-search">Enter a word</label>
-          <div class="word-definition__input-wrapper">
+          <div class="relative mt-1 flex items-center">
             <input
+              class="h-12"
               id="word-search"
-              class="input input--large text-label-14"
               [formControl]="searchControl"
               (keyup.enter)="onSearch()"
+              appInput
               placeholder="e.g. Serendipity"
               autocomplete="off"
             />
             @if (searchControl.value) {
               <button
-                class="btn btn--icon word-definition__clear-btn"
-                aria-label="Clear"
+                class="absolute right-2 inline-flex size-8 cursor-pointer items-center justify-center rounded-md border-transparent bg-transparent text-muted-foreground transition-all duration-150 hover:bg-muted"
                 (click)="searchControl.setValue('')"
+                aria-label="Clear"
               >
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <line x1="18" y1="6" x2="6" y2="18"></line>
-                  <line x1="6" y1="6" x2="18" y2="18"></line>
-                </svg>
+                <lucide-icon class="size-4" [img]="ICONS.X" />
               </button>
             }
           </div>
         </div>
 
-        <div class="word-definition__actions">
+        <div class="flex items-center gap-3">
           <button
-            class="btn btn--contrast"
-            (click)="onSearch()"
             [disabled]="isLoading() || !searchControl.value"
+            (click)="onSearch()"
+            appButton
+            variant="default"
+            size="default"
           >
             @if (isLoading()) {
-              <div class="spinner"></div>
+              <lib-spinner size="sm" variant="contrast" />
             } @else {
               Define
             }
           </button>
 
-          <button class="btn btn--light" (click)="onReset()" [disabled]="isLoading()">Reset</button>
+          <button
+            [disabled]="isLoading()"
+            (click)="onReset()"
+            appButton
+            variant="secondary"
+            size="default"
+          >
+            Reset
+          </button>
 
           <!-- History Dropdown -->
-          <div class="word-definition__history-container">
+          <div class="relative ml-auto">
             <button
-              class="btn btn--icon"
+              class="inline-flex size-10 cursor-pointer items-center justify-center rounded-md border-transparent bg-muted text-foreground transition-all duration-150 hover:bg-accent-active disabled:cursor-not-allowed disabled:opacity-50"
+              [attr.aria-expanded]="historyOpen()"
+              [disabled]="searchHistory().length === 0"
               (click)="toggleHistory()"
               (keydown.escape)="historyOpen.set(false)"
               aria-label="Search History"
               title="Search History"
-              [attr.aria-expanded]="historyOpen()"
               aria-haspopup="listbox"
-              [disabled]="searchHistory().length === 0"
             >
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M3 3v5h5"></path>
-                <path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"></path>
-                <path d="M12 8v4l3 3"></path>
-              </svg>
+              <lucide-icon class="size-5" [img]="ICONS.History" />
             </button>
 
             @if (historyOpen()) {
-              <div class="word-definition__history-menu" role="listbox">
-                <div class="word-definition__history-header">
+              <div
+                class="absolute top-[calc(100%+8px)] right-0 z-50 w-70 overflow-hidden rounded-lg border border-border bg-background shadow-lg"
+                role="listbox"
+              >
+                <div
+                  class="flex items-center justify-between border-b border-border bg-muted px-4 py-3 text-[13px] font-medium text-muted-foreground"
+                >
                   <span>Search History</span>
                   <button
-                    class="btn btn--icon word-definition__history-clear"
+                    class="inline-flex size-7 cursor-pointer items-center justify-center rounded-md border-transparent bg-transparent text-muted-foreground transition-all duration-150 hover:text-destructive"
                     (click)="clearHistory(); $event.stopPropagation()"
                     (keydown.escape)="historyOpen.set(false)"
                     aria-label="Clear History"
                     title="Clear History"
                   >
-                    <svg
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      aria-hidden="true"
-                    >
-                      <polyline points="3 6 5 6 21 6"></polyline>
-                      <path
-                        d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
-                      ></path>
-                      <line x1="10" y1="11" x2="10" y2="17"></line>
-                      <line x1="14" y1="11" x2="14" y2="17"></line>
-                    </svg>
+                    <lucide-icon class="size-4" [img]="ICONS.Trash2" />
                   </button>
                 </div>
-                <div class="word-definition__history-list">
+                <div class="max-h-75 overflow-y-auto p-1">
                   @for (word of searchHistory(); track word) {
                     <button
-                      class="word-definition__history-item"
-                      role="option"
-                      aria-selected="false"
+                      class="flex w-full cursor-pointer items-center gap-3 rounded-md border-none bg-transparent px-3 py-2 text-left text-sm text-foreground transition-colors duration-150 hover:bg-muted"
                       (click)="onSearch(word)"
                       (keydown.escape)="historyOpen.set(false)"
+                      role="option"
+                      aria-selected="false"
                     >
-                      <svg
-                        width="14"
-                        height="14"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        aria-hidden="true"
-                      >
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <polyline points="12 6 12 12 16 14"></polyline>
-                      </svg>
+                      <lucide-icon class="size-4 text-muted-foreground" [img]="ICONS.Clock" />
                       <span>{{ word }}</span>
                     </button>
                   }
                 </div>
               </div>
-              <!-- Backdrop to close menu -->
               <div
-                class="word-definition__backdrop"
+                class="fixed inset-0 z-40 cursor-default"
                 (click)="historyOpen.set(false)"
                 aria-hidden="true"
               ></div>
@@ -153,51 +112,9 @@
     </div>
   </div>
 
-  <div class="word-definition__results">
-    @if (isLoading()) {
-      <div class="word-definition__state word-definition__state--loading text-label-14">
-        <div class="spinner spinner--large"></div>
-        <p>Analyzing word nuance...</p>
-      </div>
-    } @else if (error()) {
-      <div class="word-definition__state word-definition__state--error text-label-14">
-        <svg
-          width="32"
-          height="32"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="var(--bg-error)"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <circle cx="12" cy="12" r="10"></circle>
-          <line x1="12" y1="8" x2="12" y2="12"></line>
-          <line x1="12" y1="16" x2="12.01" y2="16"></line>
-        </svg>
-        <p>{{ error() }}</p>
-      </div>
-    } @else if (definition()) {
-      <div class="card word-definition__definition-card">
-        <div class="word-definition__markdown-content" [innerHTML]="definition()"></div>
-      </div>
-    } @else {
-      <div class="word-definition__state word-definition__state--empty text-label-14">
-        <svg
-          width="48"
-          height="48"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
-          <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
-        </svg>
-        <p>Enter a word to start learning.</p>
-      </div>
-    }
-  </div>
+  <app-content-status [isLoading]="isLoading()" [error]="error()" [isEmpty]="!definition()">
+    <div class="relative rounded-lg border border-border bg-background p-6 shadow-sm">
+      <article class="prose dark:prose-invert" [innerHTML]="definition()"></article>
+    </div>
+  </app-content-status>
 </div>

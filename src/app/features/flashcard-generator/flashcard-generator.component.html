@@ -1,0 +1,17 @@
+<div class="min-h-screen bg-background-secondary p-6 text-foreground">
+  @switch (step()) {
+    @case ('input') {
+      <app-word-input (wordsSubmit)="handleWordsSubmit($event)"></app-word-input>
+    }
+    @case ('images') {
+      <app-image-selection-flow
+        [flashcards]="flashcards()"
+        (complete)="handleImagesComplete($event)"
+        (backToInput)="step.set('input')"
+      ></app-image-selection-flow>
+    }
+    @case ('preview') {
+      <app-flashcard-grid [flashcards]="flashcards()"></app-flashcard-grid>
+    }
+  }
+</div>

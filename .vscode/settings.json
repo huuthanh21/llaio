@@ -4,6 +4,7 @@
     "source.fixAll.eslint": "explicit"
   },
   "eslint.validate": ["javascript", "typescript", "html"],
+  "css.lint.unknownAtRules": "ignore",
   "[html]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
@@ -15,5 +16,14 @@
   },
   "[json]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
-  }
+  },
+  "tailwindCSS.experimental.classRegex": [
+    "tw`([^`]*)`",
+    "class:\\s*['`]([^'`]*)['`]", // class: 'foo bar' or class: `foo bar`
+    ["class:\\s*'([^']*)", "'\\[class\\.([^\\]\\s']*)'"],
+    ["'\\[class\\]': '([^']*)'", "\"([^\"]*)\""], // '[class]': 'foo ? "bar" : "baz"'
+    ["'\\[class\\]': `([^`]*)`", "'([^']*)'"], // '[class]': `foo ? 'bar' : 'baz'`
+    "\\[class\\.([^\\]]*)\\]", // '[class.foo]': 'bar' or [class.foo]="bar"
+    "'animate\\.(?:enter|leave)': '([^']*)'" // 'animate.enter': 'foo bar' or 'animate.leave': 'foo bar'
+  ]
 }

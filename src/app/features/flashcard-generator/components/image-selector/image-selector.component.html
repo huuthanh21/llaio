@@ -1,0 +1,82 @@
+<div class="mx-auto flex w-full max-w-5xl flex-col gap-6">
+  <!-- Progress indicator -->
+  <div class="flex items-center justify-between">
+    <app-badge class="px-3 py-1.5 text-sm font-medium" variant="secondary">
+      Card {{ currentIndex() + 1 }} of {{ totalCards() }}
+    </app-badge>
+    <p class="text-label-14 text-muted-foreground">
+      {{ selectedImages().length }} / 2 images selected
+    </p>
+  </div>
+
+  <!-- Flashcard info -->
+  <lib-card>
+    <lib-card-header>
+      <lib-card-title class="text-2xl font-semibold">{{ flashcard().word }}</lib-card-title>
+      <lib-card-description class="text-base"
+        >Select 1-2 images for this flashcard</lib-card-description
+      >
+    </lib-card-header>
+    <lib-card-content class="flex flex-col gap-4">
+      <div class="flex items-center gap-2">
+        <input
+          class="flex-1"
+          [formControl]="searchControl"
+          (keydown.enter)="search()"
+          appInput
+          placeholder="Search images"
+        />
+        <button class="justify-center" (click)="search()" appButton variant="secondary" size="icon">
+          <lucide-icon class="size-5" [img]="ICONS.Search" />
+          <span class="sr-only">Search</span>
+        </button>
+      </div>
+
+      <!-- Image grid -->
+      <div class="grid grid-cols-2 gap-4 md:grid-cols-3">
+        @for (image of images(); track image.id) {
+          <button
+            class="relative aspect-video cursor-pointer overflow-hidden rounded-lg border-2 bg-transparent p-0 transition-all duration-150 hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-50"
+            [class.border-border]="!isImageSelected(image.id)"
+            [class.border-foreground]="isImageSelected(image.id)"
+            [class.ring-2]="isImageSelected(image.id)"
+            [class.ring-foreground]="isImageSelected(image.id)"
+            [class.ring-offset-2]="isImageSelected(image.id)"
+            [class.ring-offset-background]="isImageSelected(image.id)"
+            [class.hover:border-muted-foreground]="!isImageSelected(image.id)"
+            [disabled]="!isImageSelected(image.id) && selectedImages().length >= 2"
+            (click)="toggleImageSelection(image)"
+            type="button"
+          >
+            <img
+              class="h-full w-full object-cover"
+              [src]="image.thumbnail || '/placeholder.svg'"
+              [alt]="image.title"
+            />
+            @if (isImageSelected(image.id)) {
+              <div class="absolute inset-0 flex items-center justify-center bg-foreground/20">
+                <div
+                  class="flex items-center justify-center rounded-full bg-foreground p-1.5 text-background"
+                >
+                  <lucide-icon class="size-5" [img]="ICONS.Check" />
+                </div>
+              </div>
+            }
+          </button>
+        }
+      </div>
+
+      <button class="w-full justify-center" (click)="loadMore()" appButton variant="secondary">
+        Load More Images
+      </button>
+    </lib-card-content>
+  </lib-card>
+
+  <!-- Navigation -->
+  <div class="flex justify-between gap-4">
+    <button (click)="back.emit()" appButton variant="secondary">Back</button>
+    <button [disabled]="selectedImages().length === 0" (click)="navigateNext()" appButton>
+      {{ currentIndex() < totalCards() - 1 ? 'Next Card' : 'Review Flashcards' }}
+    </button>
+  </div>
+</div>

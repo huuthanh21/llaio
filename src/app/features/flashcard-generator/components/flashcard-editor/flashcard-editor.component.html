@@ -1,0 +1,60 @@
+<lib-card class="max-h-[90vh] w-full" className="flex flex-col h-full overflow-hidden">
+  <lib-card-header class="flex-none">
+    <lib-card-title>Edit Flashcard</lib-card-title>
+    <lib-card-description>Make changes to your flashcard details.</lib-card-description>
+  </lib-card-header>
+
+  <lib-card-content class="flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto">
+    <!-- Images -->
+    @if (editedImages().length > 0) {
+      <div class="flex flex-col gap-2">
+        <span class="text-sm font-medium">Selected Images</span>
+        <div class="grid grid-cols-2 gap-4 sm:grid-cols-3">
+          @for (image of editedImages(); track image.id) {
+            <div class="relative aspect-video rounded-lg bg-muted">
+              <img
+                class="h-full w-full rounded-lg object-cover"
+                [src]="image.thumbnail || '/placeholder.svg'"
+                [alt]="image.title"
+              />
+              <button
+                class="absolute top-2 right-2 size-5 justify-center p-0"
+                (click)="removeImage(image.id)"
+                appButton
+                variant="destructive"
+                size="custom"
+                aria-label="Remove image"
+                shape="rounded"
+              >
+                <lucide-icon class="size-4" [img]="ICONS.X" />
+              </button>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Form Fields -->
+    <div class="grid gap-4">
+      <div class="flex flex-col gap-2">
+        <label class="text-sm font-medium" for="word">Word</label>
+        <input id="word" [formControl]="form.controls.word" appInput />
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <label class="text-sm font-medium" for="definition">Definition</label>
+        <textarea id="definition" [formControl]="form.controls.definition" appTextarea></textarea>
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <label class="text-sm font-medium" for="example">Example Sentence</label>
+        <textarea id="example" [formControl]="form.controls.example" appTextarea></textarea>
+      </div>
+    </div>
+  </lib-card-content>
+
+  <lib-card-footer class="flex-none justify-end gap-2">
+    <button (click)="onCancel()" appButton variant="secondary">Discard</button>
+    <button (click)="onSave()" appButton>Save Changes</button>
+  </lib-card-footer>
+</lib-card>

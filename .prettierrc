@@ -6,6 +6,11 @@
   "useTabs": false,
   "semi": true,
   "bracketSpacing": true,
+  "plugins": [
+    "prettier-plugin-organize-imports",
+    "prettier-plugin-organize-attributes",
+    "prettier-plugin-tailwindcss"
+  ],
   "overrides": [
     {
       "files": "*.html",
@@ -14,5 +19,6 @@
       }
     }
   ],
-  "plugins": ["prettier-plugin-organize-imports"]
+  "tailwindStylesheet": "./src/tailwind.css",
+  "tailwindFunctions": ["tw", "signal"]
 }

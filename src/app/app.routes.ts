@@ -18,6 +18,13 @@ export const routes: Routes = [
             (m) => m.WordDefinitionComponent,
           ),
       },
+      {
+        path: 'flashcard-generator',
+        loadComponent: () =>
+          import('./features/flashcard-generator/flashcard-generator.component').then(
+            (m) => m.FlashcardGeneratorComponent,
+          ),
+      },
     ],
   },
   {

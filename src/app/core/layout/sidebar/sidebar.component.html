@@ -1,75 +1,34 @@
-<nav class="sidebar-nav">
-  <ul class="sidebar-nav__list">
+<nav class="flex h-full flex-col p-3">
+  <ul class="m-0 flex-1 list-none p-0">
     @for (item of navItems; track item.label) {
       <li>
         <a
+          class="nav-link mb-1 flex h-10 cursor-pointer items-center rounded-md px-3 text-label-14 font-medium no-underline transition-all duration-150 hover:bg-accent-hover hover:text-accent-foreground"
+          #rla="routerLinkActive"
           [routerLink]="item.route"
-          routerLinkActive="sidebar-nav__link--active"
-          [routerLinkActiveOptions]="{ exact: item.route === '/' }"
-          class="sidebar-nav__link text-label-14"
+          [routerLinkActiveOptions]="{ exact: true }"
+          [class.text-muted-foreground]="!rla.isActive"
+          routerLinkActive="bg-accent-hover text-accent-foreground"
         >
-          <span class="sidebar-nav__icon">
-            @if (item.icon === 'translate') {
-              <!-- Search/Translate Icon -->
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                aria-hidden="true"
-              >
-                <circle cx="11" cy="11" r="8"></circle>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-              </svg>
-            } @else if (item.icon === 'style') {
-              <!-- Stack/Cards Icon -->
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M22 17l-1-7h-8L7 11h11l3 6zM2 17l1-7h8l6 1 3 6H2z"></path>
-                <path d="M5 17h14v2H5z"></path>
-              </svg>
-            }
+          <span class="mr-3 flex items-center justify-center">
+            <lucide-icon class="size-4.5" [img]="item.icon" aria-hidden="true" />
           </span>
-          <span class="sidebar-nav__label">{{ item.label }}</span>
+          <span>{{ item.label }}</span>
         </a>
       </li>
     }
   </ul>
 
-  <div class="sidebar-nav__footer">
-    <button type="button" class="sidebar-nav__settings-btn text-button-14" (click)="openSettings()">
-      <span class="sidebar-nav__icon">
-        <svg
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          aria-hidden="true"
-        >
-          <circle cx="12" cy="12" r="3"></circle>
-          <path
-            d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"
-          ></path>
-        </svg>
+  <div>
+    <button
+      class="mb-1 flex h-10 w-full cursor-pointer items-center rounded-md border-none bg-transparent px-3 text-left font-[inherit] text-button-14 text-muted-foreground transition-all duration-150 hover:bg-accent-hover hover:text-foreground"
+      (click)="openSettings()"
+      type="button"
+    >
+      <span class="mr-3 flex items-center justify-center">
+        <lucide-icon class="size-4.5" [img]="SettingsIcon" aria-hidden="true" />
       </span>
-      <span class="sidebar-nav__label">Settings</span>
+      <span>Settings</span>
     </button>
   </div>
 </nav>

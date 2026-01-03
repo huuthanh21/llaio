@@ -1,93 +1,61 @@
-@if (isOpen()) {
-  <div class="settings-modal__backdrop" (click)="closeModal.emit()" aria-hidden="true"></div>
-  <div
-    class="card settings-modal__dialog"
-    role="dialog"
-    aria-labelledby="settings-title"
-    aria-modal="true"
-    cdkTrapFocus
-    cdkTrapFocusAutoCapture
-    (keydown.escape)="closeModal.emit()"
+<lib-modal-header>
+  <h2 class="m-0 text-heading-24" id="settings-title">Settings</h2>
+  <button
+    class="-mt-2 -mr-2 inline-flex size-10 cursor-pointer items-center justify-center rounded-md border-transparent bg-transparent text-foreground-light transition-all duration-150 hover:bg-accent-hover hover:text-foreground"
+    (click)="closeModal.emit()"
+    aria-label="Close settings"
   >
-    <div class="settings-modal__header">
-      <h2 id="settings-title" class="text-heading-24">Settings</h2>
-      <button
-        class="btn btn--icon settings-modal__close-btn"
-        (click)="closeModal.emit()"
-        aria-label="Close settings"
-      >
-        <svg
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          aria-hidden="true"
-        >
-          <line x1="18" y1="6" x2="6" y2="18"></line>
-          <line x1="6" y1="6" x2="18" y2="18"></line>
-        </svg>
-      </button>
-    </div>
+    <lucide-icon class="size-5" [img]="ICONS.X" aria-hidden="true" />
+  </button>
+</lib-modal-header>
 
-    <div class="settings-modal__content">
-      <div class="settings-modal__group">
-        <label class="label settings-modal__input-label text-label-16" for="api-key"
-          >Gemini API Key</label
-        >
-        <div class="settings-modal__input-wrapper">
-          <input
-            id="api-key"
-            type="password"
-            class="input"
-            [formControl]="apiKeyControl"
-            placeholder="Enter your API key"
-            autocomplete="off"
-            spellcheck="false"
-          />
-        </div>
-        <p class="settings-modal__hint text-label-13">
-          Your key is stored locally and never sent to our servers.
-        </p>
-      </div>
-
-      <div class="settings-modal__group">
-        <label class="label settings-modal__input-label text-label-16" for="theme-select"
-          >Theme</label
-        >
-        <div class="settings-modal__input-wrapper">
-          <app-dropdown
-            [options]="themeOptions"
-            [formControl]="themeControl"
-            variant="full"
-            align="left"
-          />
-        </div>
-      </div>
-
-      <div class="settings-modal__group">
-        <label class="label settings-modal__input-label text-label-16" for="native-lang"
-          >Native Language</label
-        >
-        <div class="settings-modal__input-wrapper">
-          <app-dropdown
-            [options]="languages"
-            [formControl]="nativeLanguageControl"
-            variant="full"
-            align="left"
-          />
-        </div>
-        <p class="settings-modal__hint text-label-13">
-          Translations and explanations will be in this language.
-        </p>
-      </div>
-    </div>
-
-    <div class="settings-modal__actions">
-      <button class="btn" (click)="onSave()">Save</button>
-    </div>
+<lib-modal-content class="flex flex-col gap-4">
+  <div class="flex flex-col">
+    <label class="mb-2 block text-label-13" for="api-key">
+      <strong>Gemini API Key</strong>
+    </label>
+    <input
+      id="api-key"
+      [formControl]="apiKeyControl"
+      type="password"
+      placeholder="Enter your API key"
+      autocomplete="off"
+      appInput
+      spellcheck="false"
+    />
+    <p class="mt-2 text-label-13 text-muted-foreground">
+      Your key is stored locally and never sent to our servers.
+    </p>
   </div>
-}
+
+  <div class="flex flex-col">
+    <label class="mb-2 block text-label-13" for="theme-select">
+      <strong>Theme</strong>
+    </label>
+    <lib-dropdown
+      [options]="themeOptions"
+      [formControl]="themeControl"
+      variant="full"
+      align="left"
+    />
+  </div>
+
+  <div class="flex flex-col">
+    <label class="mb-2 block text-label-13" for="native-lang">
+      <strong>Native Language</strong>
+    </label>
+    <lib-dropdown
+      [options]="languages"
+      [formControl]="nativeLanguageControl"
+      variant="full"
+      align="left"
+    />
+    <p class="mt-2 text-label-13 text-muted-foreground">
+      Translations and explanations will be in this language.
+    </p>
+  </div>
+</lib-modal-content>
+
+<lib-modal-footer>
+  <button (click)="onSave()" appButton>Save</button>
+</lib-modal-footer>

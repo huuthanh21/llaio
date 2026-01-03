@@ -1,35 +1,24 @@
-<header class="top-bar">
+<header class="flex h-16 items-center border-b border-border bg-background px-6">
   <!-- Mobile Menu Button -->
   <button
-    class="btn btn--icon top-bar__menu-btn"
+    class="mr-4 inline-flex size-10 cursor-pointer items-center justify-center rounded-md border-transparent bg-accent-hover text-foreground transition-all duration-150 hover:bg-accent-active md:hidden"
     (click)="menuToggle.emit()"
     aria-label="Toggle sidebar"
   >
-    <svg
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="1.5"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-    >
-      <line x1="3" y1="12" x2="21" y2="12"></line>
-      <line x1="3" y1="6" x2="21" y2="6"></line>
-      <line x1="3" y1="18" x2="21" y2="18"></line>
-    </svg>
+    <lucide-icon class="size-6" [img]="ICONS.Menu" />
   </button>
 
-  <span class="top-bar__title text-heading-24">LLAIO</span>
+  <!-- Logo/Title -->
+  <h1 class="text-heading-24">LLAIO</h1>
 
-  <div class="top-bar__spacer"></div>
+  <!-- Spacer -->
+  <div class="flex-1"></div>
 
   <!-- Language Dropdown -->
-  <app-dropdown
+  <lib-dropdown
     [options]="languages"
-    [value]="store.targetLanguage()"
-    (valueChange)="store.setLanguage($any($event))"
+    [value]="languageStore.targetLanguage()"
+    (valueChange)="languageStore.setLanguage($any($event))"
     align="right"
   />
 </header>

@@ -24,7 +24,7 @@ You are an expert in TypeScript, Angular 21, and scalable web application develo
 ### Components
 
 - Keep components small and focused on a single responsibility
-- Always use `@Input()` and `@Output()` decorators instead of functions
+- Prefer `input()` and `output()` signals instead of `@Input()` and `@Output()` decorators
 - Always use access modifiers (`public`, `private`, `protected`)
 - Use `computed()` for derived state
 - Set `changeDetection: ChangeDetectionStrategy.OnPush` in `@Component` decorator
@@ -51,9 +51,8 @@ You are an expert in TypeScript, Angular 21, and scalable web application develo
 
 ## Styling
 
-- Use SCSS for styling
+- Use Tailwind and Geist Design System for styling
 - Use BEM for class naming
-- Use SCSS variables for themeable styles
 
 ## Services
 
@@ -67,7 +66,7 @@ You are an expert in TypeScript, Angular 21, and scalable web application develo
 
 - **Framework**: Angular 21 (Standalone Components)
 - **State Management**: @ngrx/signals (Global Signal Stores)
-- **Styles**: SCSS, BEM, Geist Design System
+- **Styles**: Tailwind, Geist Design System
 - **Build**: Vite/Esbuild (Angular CLI default)
 
 ### Architecture
@@ -86,6 +85,5 @@ You are an expert in TypeScript, Angular 21, and scalable web application develo
 ### Styling & Design
 
 - **Theme**: Geist Design System
-- **Typography**: Geise font family. See `src/styles/typography.scss` for variables.
+- **Typography**: Geise font family. See `src/tailwind.css` for classes.
 - **Global Styles**: Defined in `styles.scss`.
-- **Variables**: `src/styles.scss`.
