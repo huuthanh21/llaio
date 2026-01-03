@@ -14,8 +14,8 @@ export default defineConfig(
     files: ['**/*.ts'],
     extends: [
       eslint.configs.recommended,
-      tseslint.configs.strict,
-      tseslint.configs.stylistic,
+      ...tseslint.configs.strict,
+      ...tseslint.configs.stylistic,
       ...angular.configs.tsRecommended,
       eslintPluginPrettierRecommended,
     ],
@@ -30,7 +30,7 @@ export default defineConfig(
         'error',
         {
           type: 'attribute',
-          prefix: 'app',
+          prefix: ['app', 'lib'],
           style: 'camelCase',
         },
       ],
@@ -38,8 +38,27 @@ export default defineConfig(
         'error',
         {
           type: 'element',
-          prefix: 'app',
+          prefix: ['app', 'lib'],
           style: 'kebab-case',
+        },
+      ],
+
+      '@typescript-eslint/no-extraneous-class': [
+        'error',
+        {
+          allowWithDecorator: true,
+        },
+      ],
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          args: 'all',
+          argsIgnorePattern: '^_',
+          caughtErrors: 'all',
+          caughtErrorsIgnorePattern: '^_',
+          destructuredArrayIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          ignoreRestSiblings: true,
         },
       ],
     },
@@ -51,6 +70,8 @@ export default defineConfig(
       ...angular.configs.templateAccessibility,
       eslintPluginPrettierRecommended,
     ],
-    rules: {},
+    rules: {
+      'prettier/prettier': ['error', { parser: 'angular' }],
+    },
   },
 );

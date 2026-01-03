@@ -1,0 +1,25 @@
+/**
+ * Global modal animations using Angular's animate.leave
+ * 
+ * Usage in templates:
+ *   <div animate.leave="modal-backdrop-leave">...</div>
+ *   <div animate.leave="modal-leave">...</div>
+ * 
+ * Note: animate.enter is not used because it applies the starting state
+ * and never transitions back, leaving elements invisible.
+ */
+
+/* Backdrop leave animation - fade out */
+.modal-backdrop-leave {
+  opacity: 0;
+  transition: opacity 150ms ease-in;
+}
+
+/* Modal content leave animation - shrink and fade */
+.modal-leave {
+  opacity: 0;
+  scale: 0.95;
+  transition:
+    opacity 150ms ease-in,
+    scale 150ms ease-in;
+}

@@ -1,0 +1,66 @@
+<lib-card class="mx-auto w-full max-w-2xl" [className]="'bg-background'">
+  <lib-card-header>
+    <lib-card-title class="text-heading-20 font-semibold">Flashcard Generator</lib-card-title>
+    <lib-card-description class="text-label-14">
+      Enter words separated by commas, whitespace, or new lines
+    </lib-card-description>
+  </lib-card-header>
+  <lib-card-content class="flex flex-col gap-6">
+    <div class="flex flex-col gap-3">
+      <textarea
+        class="min-h-32 resize-none font-mono text-sm"
+        [formControl]="inputControl"
+        name="words"
+        appTextarea
+        placeholder="apple, banana, cherry&#10;dog, cat, bird"
+      ></textarea>
+      <button class="w-full justify-center" (click)="parseWords()" appButton variant="secondary">
+        Parse Words
+      </button>
+    </div>
+
+    @if (words().length > 0) {
+      <div class="flex flex-col gap-3">
+        <div class="flex items-center justify-between">
+          <p class="text-label-14">
+            <strong>
+              {{ words().length }} {{ words().length === 1 ? 'word' : 'words' }} parsed
+            </strong>
+          </p>
+          <button
+            class="h-8 px-2 text-muted-foreground"
+            (click)="setWords([])"
+            appButton
+            variant="ghost"
+            size="sm"
+            shape="rounded"
+          >
+            Clear all
+          </button>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          @for (word of words(); track i; let i = $index; let first = $first) {
+            <app-badge
+              class="inline-flex items-center py-1 pr-1 text-sm font-normal"
+              [class.pl-0]="first"
+              [class.pl-1]="!first"
+              variant="secondary"
+            >
+              {{ word }}
+              <button
+                class="ml-2 flex cursor-pointer items-center border-none bg-transparent p-0 text-foreground-light hover:text-destructive focus:outline-none"
+                [attr.aria-label]="'Remove ' + word"
+                (click)="removeWord(i)"
+              >
+                <lucide-icon class="size-3" [img]="ICONS.X" />
+              </button>
+            </app-badge>
+          }
+        </div>
+        <button class="w-full justify-center" (click)="submit()" appButton>
+          Create Flashcards
+        </button>
+      </div>
+    }
+  </lib-card-content>
+</lib-card>

@@ -1,16 +1,21 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
+import { LucideAngularModule, SearchIcon, Settings, Sparkles } from 'lucide-angular';
 import { SettingsStore } from '../../stores/settings.store';
 
 @Component({
   selector: 'app-sidebar',
-  imports: [RouterLink, RouterLinkActive],
+  imports: [RouterLink, RouterLinkActive, LucideAngularModule],
   templateUrl: './sidebar.component.html',
-  styleUrl: './sidebar.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SidebarComponent {
-  protected navItems = [{ label: 'Word Definition', route: '/lookup', icon: 'translate' }];
+  protected readonly SettingsIcon = Settings;
+
+  protected navItems = [
+    { label: 'Word Definition', route: '/lookup', icon: SearchIcon },
+    { label: 'Flashcard Generator', route: '/flashcard-generator', icon: Sparkles },
+  ];
 
   private readonly settingsStore = inject(SettingsStore);
 

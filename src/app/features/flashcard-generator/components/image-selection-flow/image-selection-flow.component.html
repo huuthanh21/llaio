@@ -1,0 +1,10 @@
+@if (currentCard()) {
+  <app-image-selector
+    [flashcard]="currentCard()!"
+    [currentIndex]="currentIndex()"
+    [totalCards]="flashcards().length"
+    (imagesSelected)="selectCardImages($event)"
+    (next)="moveToNextCard()"
+    (back)="moveToPreviousCard()"
+  ></app-image-selector>
+}

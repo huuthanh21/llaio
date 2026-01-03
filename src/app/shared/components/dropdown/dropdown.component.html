@@ -1,83 +1,65 @@
 <div
-  class="dropdown"
-  [class.dropdown--full]="variant === 'full'"
-  [class.dropdown--right]="align === 'right'"
+  class="relative inline-block"
+  [class.block]="variant() === 'full'"
+  [class.w-full]="variant() === 'full'"
+  [class.dropdown--right]="align() === 'right'"
   [class.active]="isOpen()"
 >
   <button
+    class="justify-between px-3.5"
     #triggerBtn
-    type="button"
-    class="btn dropdown__trigger text-button-14"
-    [class.dropdown__trigger--full]="variant === 'full'"
+    [class.w-full]="variant() === 'full'"
     [disabled]="disabled()"
-    (click)="toggleDropdown()"
+    [class.ring-border-active]="isOpen()"
     [attr.aria-expanded]="isOpen()"
-    aria-haspopup="listbox"
+    [attr.aria-haspopup]="'listbox'"
+    (click)="toggleDropdown()"
+    type="button"
+    appButton
+    variant="secondary"
+    size="default"
   >
-    <span class="dropdown__value">
+    <span class="flex items-center gap-2">
       @if (selectedOption()?.icon) {
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          class="dropdown__item-icon"
-          aria-hidden="true"
-        >
-          <path [attr.d]="selectedOption()!.icon" />
-        </svg>
+        <lucide-icon [img]="selectedOption()!.icon" [size]="16" />
       }
       {{ selectedOption()?.label }}
     </span>
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="2"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      class="dropdown__chevron"
-    >
-      <path d="M6 9l6 6 6-6" />
-    </svg>
+    <span>
+      <lucide-icon [class.rotate-180]="isOpen()" [img]="ICONS.ChevronDown" [size]="16" />
+    </span>
   </button>
 
   @if (isOpen()) {
-    <div class="dropdown__menu" role="listbox" [style.max-height]="menuMaxHeight()">
+    <div
+      class="absolute top-[calc(100%+4px)] left-0 z-1000 w-full min-w-45 animate-dropdown-fade-in overflow-y-auto overscroll-contain rounded-md border border-border bg-popover p-1 shadow-lg"
+      [class.left-auto]="align() === 'right'"
+      [class.right-0]="align() === 'right'"
+      [style.max-height]="menuMaxHeight()"
+      role="listbox"
+    >
       @for (option of normalizedOptions(); track option.value) {
         <button
-          type="button"
-          class="dropdown__item text-label-14"
-          role="option"
+          class="my-0.5 flex w-full cursor-pointer items-center gap-2 rounded-sm border-none px-3 py-1.5 text-left text-label-14 transition-all duration-150 hover:bg-accent-hover hover:text-foreground"
           [attr.aria-selected]="selectedValue() === option.value"
+          [class.bg-accent-hover]="selectedValue() === option.value"
+          [class.text-foreground]="selectedValue() === option.value"
+          [class.text-muted-foreground]="selectedValue() !== option.value"
           (click)="selectOption(option.value)"
+          type="button"
+          role="option"
         >
           @if (option.icon) {
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              class="dropdown__item-icon"
-              aria-hidden="true"
-            >
-              <path [attr.d]="option.icon" />
-            </svg>
+            <lucide-icon [img]="option.icon" [size]="16" />
           }
-          <span class="dropdown__item-label">{{ option.label }}</span>
+          <span>{{ option.label }}</span>
         </button>
       }
     </div>
-    <div class="dropdown__backdrop" (click)="closeDropdown()" aria-hidden="true"></div>
+    <div
+      class="fixed inset-0 z-999 cursor-default"
+      (click)="closeDropdown()"
+      aria-hidden="true"
+    ></div>
   }
 </div>

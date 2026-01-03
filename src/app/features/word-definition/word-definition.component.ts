@@ -1,34 +1,52 @@
-import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { GeminiService } from '@core/services';
+import { ButtonDirective, SpinnerComponent } from '@shared/components';
+import { InputDirective } from '@shared/directives';
+import { Clock, History, LucideAngularModule, Trash2, X } from 'lucide-angular';
 import { marked } from 'marked';
-import { GeminiService } from '../../core/services/gemini.service';
-import { WordHistoryService } from '../../core/services/word-history.service';
-
+import { ContentStatusComponent } from './components/content-status/content-status.component';
+import { WordHistoryService } from './services/word-history.service';
 @Component({
   selector: 'app-word-definition',
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [
+    ReactiveFormsModule,
+    SpinnerComponent,
+    LucideAngularModule,
+    ContentStatusComponent,
+    ButtonDirective,
+    InputDirective,
+  ],
   templateUrl: './word-definition.component.html',
-  styleUrl: './word-definition.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class WordDefinitionComponent {
-  private geminiService = inject(GeminiService);
+  // Services
+  private readonly geminiService = inject(GeminiService);
 
-  private wordHistoryService = inject(WordHistoryService);
+  private readonly wordHistoryService = inject(WordHistoryService);
 
-  protected searchControl = new FormControl<string>('', { nonNullable: true });
+  // Constants
+  protected readonly ICONS = {
+    X,
+    History,
+    Trash2,
+    Clock,
+  };
 
-  protected definition = signal<string>('');
+  // Public Properties
+  public readonly searchControl = new FormControl<string>('', { nonNullable: true });
 
-  protected isLoading = signal(false);
+  // Protected State
+  protected readonly definition = signal<string>('');
 
-  protected error = signal<string | null>(null);
+  protected readonly isLoading = signal(false);
 
-  protected historyOpen = signal(false);
+  protected readonly error = signal<string | null>(null);
 
-  // History
-  protected searchHistory = this.wordHistoryService.history;
+  protected readonly historyOpen = signal(false);
+
+  protected readonly searchHistory = this.wordHistoryService.history;
 
   public async onSearch(word: string | null = null) {
     const searchTerm = word || this.searchControl.value;

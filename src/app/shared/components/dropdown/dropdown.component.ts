@@ -2,26 +2,27 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   ElementRef,
-  EventEmitter,
-  Input,
-  Output,
+  input,
+  output,
   signal,
-  ViewChild,
+  viewChild,
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { ChevronDown, LucideAngularModule, LucideIconData } from 'lucide-angular';
+import { ButtonDirective } from '../../directives/button/button.directive';
 
 export interface DropdownOption {
   value: string;
   label: string;
-  icon?: string; // SVG path data (d attribute value)
+  icon?: LucideIconData;
 }
 
 @Component({
-  selector: 'app-dropdown',
-  imports: [],
+  selector: 'lib-dropdown',
+  imports: [ButtonDirective, LucideAngularModule],
   templateUrl: './dropdown.component.html',
-  styleUrl: './dropdown.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
     {
@@ -32,48 +33,36 @@ export interface DropdownOption {
   ],
 })
 export class DropdownComponent implements ControlValueAccessor {
-  private readonly rawOptions = signal<string[] | DropdownOption[]>([]);
+  // Constants
+  protected readonly ICONS = {
+    ChevronDown,
+  };
 
-  @Input()
-  public set options(val: string[] | DropdownOption[]) {
-    this.rawOptions.set(val);
-  }
+  // Inputs
+  public readonly options = input<string[] | DropdownOption[]>([]);
 
-  protected readonly normalizedOptions = computed<DropdownOption[]>(() => {
-    const options = this.rawOptions();
-    if (options.length === 0) return [];
-    if (typeof options[0] === 'string') {
-      return (options as string[]).map((option) => ({ value: option, label: option }));
-    }
-    return options as DropdownOption[];
-  });
+  public readonly value = input<string>('');
 
-  protected readonly selectedOption = computed<DropdownOption | undefined>(() => {
-    const value = this.selectedValue();
-    return this.normalizedOptions().find((option) => option.value === value);
-  });
+  public readonly variant = input<'default' | 'full'>('default');
 
-  @Input()
-  public set value(val: string) {
-    this.selectedValue.set(val);
-  }
+  public readonly align = input<'left' | 'right'>('left');
 
-  @Input() public variant: 'default' | 'full' = 'default';
+  // Outputs
+  public readonly valueChange = output<string>();
 
-  @Input() public align: 'left' | 'right' = 'left';
+  // View Queries
+  private readonly triggerRef = viewChild<ElementRef<HTMLButtonElement>>('triggerBtn');
 
-  @ViewChild('triggerBtn') private readonly triggerRef?: ElementRef<HTMLButtonElement>;
+  // Protected State
+  protected readonly isOpen = signal(false);
 
-  protected menuMaxHeight = signal<string | null>(null);
+  protected readonly selectedValue = signal<string>('');
 
-  @Output() public readonly valueChange = new EventEmitter<string>();
+  protected readonly disabled = signal(false);
 
-  protected isOpen = signal(false);
+  protected readonly menuMaxHeight = signal<string | null>(null);
 
-  protected selectedValue = signal<string>('');
-
-  protected disabled = signal(false);
-
+  // Private State
   private onChange: (value: string) => void = () => {
     // Empty
   };
@@ -81,6 +70,32 @@ export class DropdownComponent implements ControlValueAccessor {
   private onTouched: () => void = () => {
     // Empty
   };
+
+  // Computed Signals
+  protected readonly normalizedOptions = computed<DropdownOption[]>(() => {
+    const opts = this.options();
+    if (opts.length === 0) return [];
+    if (typeof opts[0] === 'string') {
+      return (opts as string[]).map((option) => ({ value: option, label: option }));
+    }
+    return opts as DropdownOption[];
+  });
+
+  protected readonly selectedOption = computed<DropdownOption | undefined>(() => {
+    const value = this.selectedValue();
+    return this.normalizedOptions().find((option) => option.value === value);
+  });
+
+  // Constructor
+  public constructor() {
+    // Sync external value input to internal selectedValue signal
+    effect(() => {
+      const val = this.value();
+      if (val) {
+        this.selectedValue.set(val);
+      }
+    });
+  }
 
   public writeValue(value: string): void {
     this.selectedValue.set(value);
@@ -112,7 +127,7 @@ export class DropdownComponent implements ControlValueAccessor {
   }
 
   private calculateMenuMaxHeight(): void {
-    const triggerEl = this.triggerRef?.nativeElement;
+    const triggerEl = this.triggerRef()?.nativeElement;
     if (!triggerEl) return;
 
     const rect = triggerEl.getBoundingClientRect();

@@ -1,18 +1,26 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, inject, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, output } from '@angular/core';
+import { LucideAngularModule, MenuIcon } from 'lucide-angular';
 import { DropdownComponent } from '../../../shared/components/dropdown/dropdown.component';
 import { Language, LANGUAGES, LanguageStore } from '../../stores/language.store';
 
 @Component({
   selector: 'app-top-bar',
-  imports: [DropdownComponent],
+  imports: [DropdownComponent, LucideAngularModule],
   templateUrl: './top-bar.component.html',
-  styleUrl: './top-bar.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TopBarComponent {
-  @Output() public readonly menuToggle = new EventEmitter<void>();
+  // Services
+  protected readonly languageStore = inject(LanguageStore);
 
-  protected readonly store = inject(LanguageStore);
+  // Constants
+  protected readonly ICONS = {
+    Menu: MenuIcon,
+  };
 
-  protected languages: Language[] = LANGUAGES;
+  // Outputs
+  public readonly menuToggle = output();
+
+  // Properties
+  protected readonly languages: Language[] = LANGUAGES;
 }

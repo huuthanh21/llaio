@@ -1,0 +1,55 @@
+:host {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* Badge base styles - using CSS instead of @apply for compatibility */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 9999px;
+  border: 1px solid transparent;
+  padding: 0.125rem 0.625rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  transition:
+    color 150ms,
+    background-color 150ms,
+    border-color 150ms;
+}
+
+.badge:focus {
+  outline: 2px solid var(--foreground);
+  outline-offset: 2px;
+}
+
+/* Variants */
+.variant-default {
+  background-color: var(--foreground);
+  color: var(--background);
+}
+.variant-default:hover {
+  opacity: 0.8;
+}
+
+.variant-secondary {
+  background-color: var(--accent-hover);
+  color: var(--foreground);
+}
+.variant-secondary:hover {
+  background-color: var(--accent-active);
+}
+
+.variant-destructive {
+  background-color: var(--destructive);
+  color: white;
+}
+.variant-destructive:hover {
+  opacity: 0.8;
+}
+
+.variant-outline {
+  border-color: var(--foreground);
+  color: var(--foreground);
+  background-color: transparent;
+}

@@ -1,0 +1,20 @@
+<lib-modal-content class="flex flex-col items-center gap-6 py-4 text-center">
+  <div class="flex size-16 items-center justify-center rounded-full bg-muted">
+    <lucide-icon class="size-8 text-muted-foreground" [img]="ICONS.Download" />
+  </div>
+
+  <div class="flex flex-col gap-2">
+    <h2 class="text-xl font-semibold">Export Flashcards</h2>
+    <p class="text-muted-foreground">
+      Ready to export
+      <span class="font-medium text-foreground">{{ flashcards().length }} flashcards</span>.
+      <br />
+      Since this is a demo, we will download a JSON file instead of an .apkg file.
+    </p>
+  </div>
+</lib-modal-content>
+
+<lib-modal-footer>
+  <button (click)="cancelExport.emit()" appButton variant="secondary">Cancel</button>
+  <button (click)="handleExport()" appButton>Download JSON</button>
+</lib-modal-footer>

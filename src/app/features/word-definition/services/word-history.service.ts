@@ -1,5 +1,5 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { Language, LanguageStore } from '../stores/language.store';
+import { Language, LanguageStore } from '@core/stores';
 
 export interface HistoryEntry {
   word: string;

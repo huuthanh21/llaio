@@ -1,0 +1,28 @@
+@if (isOpen()) {
+  <!-- Backdrop -->
+  <div
+    class="fixed inset-0 z-100 bg-black/50"
+    (click)="handleBackdropClick()"
+    animate.leave="modal-backdrop-leave"
+    aria-hidden="true"
+  ></div>
+
+  <!-- Modal container -->
+  <div
+    class="fixed inset-0 z-101 flex items-center justify-center p-4"
+    [attr.aria-labelledby]="ariaLabelledBy() || null"
+    (keydown.escape)="handleEscapeKey()"
+    animate.leave="modal-leave"
+    role="dialog"
+    aria-modal="true"
+    cdkTrapFocus
+    cdkTrapFocusAutoCapture
+  >
+    <div
+      class="flex max-h-[90vh] w-full flex-col overflow-hidden rounded-lg border border-border bg-background shadow-lg dark:bg-background-secondary"
+      [style.max-width]="maxWidth()"
+    >
+      <ng-content></ng-content>
+    </div>
+  </div>
+}

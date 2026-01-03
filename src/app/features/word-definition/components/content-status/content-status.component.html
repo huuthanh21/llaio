@@ -1,0 +1,20 @@
+@if (isLoading()) {
+  <div class="flex flex-col items-center justify-center gap-4 py-12 text-center">
+    <lib-spinner size="lg" />
+    <p class="text-sm text-muted-foreground">Analyzing word nuance...</p>
+  </div>
+} @else if (error()) {
+  <div class="flex flex-col items-center justify-center gap-4 py-12 text-center text-destructive">
+    <lucide-icon class="size-8" [img]="ICONS.CircleAlert" />
+    <p class="text-sm">{{ error() }}</p>
+  </div>
+} @else if (isEmpty()) {
+  <div
+    class="flex flex-col items-center justify-center gap-4 py-12 text-center text-muted-foreground"
+  >
+    <lucide-icon class="size-10" [img]="ICONS.BookType" />
+    <p class="text-sm">Enter a word to start learning.</p>
+  </div>
+} @else {
+  <ng-content />
+}

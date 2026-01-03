@@ -1,0 +1,192 @@
+/* ============================================
+    Geist Typography Utilities
+    ============================================ */
+
+/* Headings - Used to introduce pages or sections */
+@utility text-heading-32 {
+  font-size: 32px;
+  line-height: 40px;
+  letter-spacing: -1.28px;
+  font-weight: 600;
+
+  & > strong {
+    font-weight: 500;
+  }
+}
+
+@utility text-heading-24 {
+  font-size: 24px;
+  line-height: 32px;
+  letter-spacing: -0.96px;
+  font-weight: 600;
+
+  & > strong {
+    font-weight: 500;
+  }
+}
+
+@utility text-heading-20 {
+  font-size: 20px;
+  line-height: 26px;
+  letter-spacing: -0.4px;
+  font-weight: 600;
+
+  & > strong {
+    font-weight: 500;
+  }
+}
+
+@utility text-heading-16 {
+  font-size: 16px;
+  line-height: 24px;
+  letter-spacing: -0.32px;
+  font-weight: 600;
+
+  & > strong {
+    font-weight: 500;
+  }
+}
+
+@utility text-heading-14 {
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: -0.28px;
+  font-weight: 600;
+}
+
+/* Buttons - Only for button components */
+@utility text-button-16 {
+  font-size: 16px;
+  line-height: 20px;
+  font-weight: 500;
+}
+
+@utility text-button-14 {
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
+}
+
+@utility text-button-12 {
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 500;
+}
+
+/* Labels - Designed for single-lines with ample line-height */
+@utility text-label-20 {
+  font-size: 20px;
+  line-height: 32px;
+  font-weight: 400;
+}
+
+@utility text-label-18 {
+  font-size: 18px;
+  line-height: 20px;
+  font-weight: 400;
+}
+
+@utility text-label-16 {
+  font-size: 16px;
+  line-height: 20px;
+  font-weight: 400;
+  color: var(--foreground-light);
+
+  & > strong {
+    font-weight: 500;
+  }
+}
+
+@utility text-label-14 {
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 400;
+  color: var(--foreground-light);
+
+  & > strong {
+    font-weight: 500;
+  }
+}
+
+@utility text-label-13 {
+  font-size: 13px;
+  line-height: 20px;
+  font-weight: 400;
+  color: var(--foreground-light);
+
+  & > strong {
+    font-weight: 500;
+  }
+}
+
+/* Copy - Designed for multiple lines with higher line-height */
+@utility text-copy-24 {
+  font-size: 24px;
+  line-height: 36px;
+  font-weight: 400;
+  color: var(--foreground-light);
+
+  & > strong {
+    font-weight: 500;
+    color: var(--foreground);
+  }
+}
+
+@utility text-copy-20 {
+  font-size: 20px;
+  line-height: 36px;
+  font-weight: 400;
+  color: var(--foreground-light);
+
+  & > strong {
+    font-weight: 500;
+    color: var(--foreground);
+  }
+}
+
+@utility text-copy-18 {
+  font-size: 18px;
+  line-height: 28px;
+  font-weight: 400;
+  color: var(--foreground-light);
+
+  & > strong {
+    font-weight: 500;
+    color: var(--foreground);
+  }
+}
+
+@utility text-copy-16 {
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 400;
+  color: var(--foreground-light);
+
+  & > strong {
+    font-weight: 500;
+    color: var(--foreground);
+  }
+}
+
+@utility text-copy-14 {
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 400;
+  color: var(--foreground-light);
+
+  & > strong {
+    font-weight: 500;
+    color: var(--foreground);
+  }
+}
+
+@utility text-copy-13 {
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: 400;
+
+  & > strong {
+    font-weight: 500;
+    color: var(--foreground);
+  }
+}
