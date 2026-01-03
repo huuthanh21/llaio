@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, output, signal } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { LucideAngularModule, X } from 'lucide-angular';
 import { BadgeComponent } from '../../../../shared/components/badge/badge.component';
@@ -34,6 +34,11 @@ export class WordInputComponent {
   protected readonly ICONS = {
     X,
   };
+
+  // Inputs
+  public readonly isLoading = input(false);
+
+  public readonly error = input<string | null>(null);
 
   // Outputs
   public readonly wordsSubmit = output<string[]>();

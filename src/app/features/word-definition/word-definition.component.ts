@@ -42,6 +42,8 @@ export class WordDefinitionComponent {
 
   protected readonly isLoading = signal(false);
 
+  protected readonly isStreaming = signal(false);
+
   protected readonly error = signal<string | null>(null);
 
   protected readonly historyOpen = signal(false);
@@ -66,20 +68,27 @@ export class WordDefinitionComponent {
     }
 
     this.isLoading.set(true);
+    this.isStreaming.set(true);
     this.definition.set('');
 
+    let lastParsed = '';
     this.geminiService.generateDefinition(searchTerm).subscribe({
       next: async (result) => {
         const parsed = await marked.parse(result, { breaks: true });
         this.definition.set(parsed);
-        // Save response to history for future lookups
-        this.wordHistoryService.addToHistory(searchTerm, parsed);
+        lastParsed = parsed;
         this.isLoading.set(false);
       },
       error: (err) => {
         console.error('Gemini API Error:', err);
         this.error.set('Failed to fetch definition. Please check your API key and connection.');
         this.isLoading.set(false);
+        this.isStreaming.set(false);
+      },
+      complete: () => {
+        this.isStreaming.set(false);
+        // Save final response to history for future lookups
+        this.wordHistoryService.addToHistory(searchTerm, lastParsed);
       },
     });
   }

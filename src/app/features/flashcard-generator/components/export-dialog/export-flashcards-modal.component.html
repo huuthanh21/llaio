@@ -4,17 +4,27 @@
   </div>
 
   <div class="flex flex-col gap-2">
-    <h2 class="text-xl font-semibold">Export Flashcards</h2>
+    <h2 class="text-xl font-semibold">Export to Anki</h2>
     <p class="text-muted-foreground">
       Ready to export
-      <span class="font-medium text-foreground">{{ flashcards().length }} flashcards</span>.
-      <br />
-      Since this is a demo, we will download a JSON file instead of an .apkg file.
+      <span class="font-medium text-foreground">{{ flashcards().length }} flashcards</span>
+      as an Anki deck (.apkg file).
     </p>
+    @if (errorMessage()) {
+      <p class="text-sm text-destructive">{{ errorMessage() }}</p>
+    }
   </div>
 </lib-modal-content>
 
 <lib-modal-footer>
-  <button (click)="cancelExport.emit()" appButton variant="secondary">Cancel</button>
-  <button (click)="handleExport()" appButton>Download JSON</button>
+  <button [disabled]="isExporting()" (click)="cancelExport.emit()" appButton variant="secondary">
+    Cancel
+  </button>
+  <button [disabled]="isExporting()" (click)="handleExport()" appButton>
+    @if (isExporting()) {
+      Exporting...
+    } @else {
+      Download .apkg
+    }
+  </button>
 </lib-modal-footer>

@@ -10,16 +10,20 @@
   </div>
 
   <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-    @for (card of flashcards(); track card.word) {
+    @for (card of flashcards(); track card.id) {
       <div
         class="relative cursor-pointer rounded-lg hover:ring-2 hover:ring-border-active hover:ring-offset-2 hover:ring-offset-background"
-        [attr.aria-label]="'Edit flashcard for ' + card.word"
+        [attr.aria-label]="'Edit flashcard for ' + getCardTitle(card)"
         (click)="openEditor(card)"
         (keyup.enter)="openEditor(card)"
         tabindex="0"
         role="button"
       >
-        <app-flashcard-preview [flashcard]="card" [compact]="true"></app-flashcard-preview>
+        <app-flashcard-preview
+          [flashcard]="card"
+          [noteType]="noteType()"
+          [compact]="true"
+        ></app-flashcard-preview>
 
         <div
           class="absolute inset-0 z-10 flex items-center justify-center rounded-xl bg-black/40 opacity-0 transition-opacity duration-200 hover:opacity-100"
@@ -38,6 +42,7 @@
   <lib-modal [isOpen]="!!editingCard()" (closeModal)="closeEditor()" size="lg">
     <app-flashcard-editor
       [flashcard]="editingCard()"
+      [noteType]="noteType()"
       (save)="saveCard($event)"
       (cancelEdit)="closeEditor()"
     />
@@ -47,6 +52,7 @@
   <lib-modal [isOpen]="showExportDialog()" (closeModal)="showExportDialog.set(false)" size="md">
     <app-export-flashcards-modal
       [flashcards]="flashcards()"
+      [noteType]="noteType()"
       (cancelExport)="showExportDialog.set(false)"
     />
   </lib-modal>

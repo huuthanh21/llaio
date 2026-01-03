@@ -1,16 +1,18 @@
 <lib-card [className]="'overflow-hidden ' + (compact() ? '' : 'max-w-md')">
   <lib-card-header>
-    <span class="text-heading-20"><strong>Word: </strong> {{ flashcard().word }}</span>
+    <span class="text-heading-20">
+      <strong>{{ titleField() ? flashcard().fieldValues[titleField()!.name] : 'Untitled' }}</strong>
+    </span>
   </lib-card-header>
   <lib-card-content class="flex flex-col gap-4 p-6">
-    <!-- Images - scaled to 200px height -->
+    <!-- Images preview - 2 per row, small thumbnails -->
     @if (flashcard().selectedImages.length > 0) {
-      <div class="flex flex-col gap-2">
+      <div class="grid grid-cols-2 gap-2">
         @for (image of flashcard().selectedImages; track image.id) {
           <div class="overflow-hidden rounded-lg border border-border bg-muted">
             <img
-              class="block h-50 w-full object-cover"
-              [src]="image.url || '/placeholder.svg'"
+              class="block h-20 w-full object-cover"
+              [src]="image.thumbnail || image.url || '/placeholder.svg'"
               [alt]="image.title"
             />
           </div>
@@ -18,22 +20,18 @@
       </div>
     }
 
-    <!-- Definition -->
-    <div class="flex flex-col gap-1.5">
-      <p class="m-0 text-xs font-medium tracking-wide text-muted-foreground uppercase">
-        Definition
-      </p>
-      <p [class]="'m-0 text-foreground ' + (compact() ? 'text-sm' : 'text-base')">
-        {{ flashcard().definition }}
-      </p>
-    </div>
-
-    <!-- Example -->
-    <div class="flex flex-col gap-1.5">
-      <p class="m-0 text-xs font-medium tracking-wide text-muted-foreground uppercase">Example</p>
-      <p [class]="'m-0 text-foreground italic ' + (compact() ? 'text-sm' : 'text-base')">
-        {{ flashcard().example }}
-      </p>
-    </div>
+    <!-- Dynamic Fields -->
+    @for (field of displayFields(); track field.name) {
+      @if (flashcard().fieldValues[field.name]) {
+        <div class="flex flex-col gap-1.5">
+          <p class="m-0 text-xs font-medium tracking-wide text-muted-foreground uppercase">
+            {{ field.name }}
+          </p>
+          <p [class]="'m-0 text-foreground ' + (compact() ? 'text-sm' : 'text-base')">
+            {{ flashcard().fieldValues[field.name] }}
+          </p>
+        </div>
+      }
+    }
   </lib-card-content>
 </lib-card>

@@ -8,9 +8,11 @@
   line-height: 40px;
   letter-spacing: -1.28px;
   font-weight: 600;
+  color: var(--foreground);
 
   & > strong {
     font-weight: 500;
+    color: var(--foreground-light);
   }
 }
 
@@ -19,9 +21,11 @@
   line-height: 32px;
   letter-spacing: -0.96px;
   font-weight: 600;
+  color: var(--foreground);
 
   & > strong {
     font-weight: 500;
+    color: var(--foreground-light);
   }
 }
 
@@ -30,9 +34,11 @@
   line-height: 26px;
   letter-spacing: -0.4px;
   font-weight: 600;
+  color: var(--foreground);
 
   & > strong {
     font-weight: 500;
+    color: var(--foreground-light);
   }
 }
 
@@ -41,9 +47,11 @@
   line-height: 24px;
   letter-spacing: -0.32px;
   font-weight: 600;
+  color: var(--foreground);
 
   & > strong {
     font-weight: 500;
+    color: var(--foreground-light);
   }
 }
 
@@ -52,6 +60,7 @@
   line-height: 20px;
   letter-spacing: -0.28px;
   font-weight: 600;
+  color: var(--foreground);
 }
 
 /* Buttons - Only for button components */
@@ -59,18 +68,21 @@
   font-size: 16px;
   line-height: 20px;
   font-weight: 500;
+  color: var(--foreground);
 }
 
 @utility text-button-14 {
   font-size: 14px;
   line-height: 20px;
   font-weight: 500;
+  color: var(--foreground);
 }
 
 @utility text-button-12 {
   font-size: 12px;
   line-height: 16px;
   font-weight: 500;
+  color: var(--foreground);
 }
 
 /* Labels - Designed for single-lines with ample line-height */
@@ -78,12 +90,14 @@
   font-size: 20px;
   line-height: 32px;
   font-weight: 400;
+  color: var(--foreground);
 }
 
 @utility text-label-18 {
   font-size: 18px;
   line-height: 20px;
   font-weight: 400;
+  color: var(--foreground);
 }
 
 @utility text-label-16 {
