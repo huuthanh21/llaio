@@ -34,27 +34,23 @@
       </div>
     }
 
-    <!-- Form Fields -->
-    <div class="grid gap-4">
-      <div class="flex flex-col gap-2">
-        <label class="text-sm font-medium" for="word">Word</label>
-        <input id="word" [formControl]="form.controls.word" appInput />
-      </div>
-
-      <div class="flex flex-col gap-2">
-        <label class="text-sm font-medium" for="definition">Definition</label>
-        <textarea id="definition" [formControl]="form.controls.definition" appTextarea></textarea>
-      </div>
-
-      <div class="flex flex-col gap-2">
-        <label class="text-sm font-medium" for="example">Example Sentence</label>
-        <textarea id="example" [formControl]="form.controls.example" appTextarea></textarea>
-      </div>
+    <!-- Dynamic Form Fields -->
+    <div class="grid gap-4" [formGroup]="form()">
+      @for (field of editableFields(); track field.name) {
+        <div class="flex flex-col gap-2">
+          <label class="text-sm font-medium" [for]="field.name">{{ field.name }}</label>
+          @if (field.fieldType === 'textarea') {
+            <textarea [id]="field.name" [formControlName]="field.name" appTextarea></textarea>
+          } @else {
+            <input [id]="field.name" [formControlName]="field.name" appInput />
+          }
+        </div>
+      }
     </div>
   </lib-card-content>
 
   <lib-card-footer class="flex-none justify-end gap-2">
-    <button (click)="onCancel()" appButton variant="secondary">Discard</button>
-    <button (click)="onSave()" appButton>Save Changes</button>
+    <button (click)="discardChanges()" appButton variant="secondary">Discard</button>
+    <button (click)="saveChanges()" appButton>Save Changes</button>
   </lib-card-footer>
 </lib-card>

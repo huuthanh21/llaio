@@ -8,19 +8,19 @@ import {
   signal,
 } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { Check, LucideAngularModule, Search } from 'lucide-angular';
-import { BadgeComponent } from '../../../../shared/components/badge/badge.component';
 import {
+  BadgeComponent,
   CardComponent,
   CardContentDirective,
   CardDescriptionDirective,
   CardHeaderDirective,
   CardTitleDirective,
-} from '../../../../shared/components/card/card.component';
-import { ButtonDirective } from '../../../../shared/directives/button/button.directive';
-import { InputDirective } from '../../../../shared/directives/input/input.directive';
+} from '@shared/components';
+import { ButtonDirective, InputDirective } from '@shared/directives';
+import { Check, LucideAngularModule, Search } from 'lucide-angular';
 import { Flashcard, FlashcardImage } from '../../models/flashcard.types';
-import { MockDataService } from '../../services/mock-data.service';
+import { NoteType, NoteTypeField } from '../../models/note-type.model';
+import { IMAGES_PER_PAGE, ImageSearchService } from '../../services/image-search.service';
 
 @Component({
   selector: 'app-image-selector',
@@ -41,7 +41,7 @@ import { MockDataService } from '../../services/mock-data.service';
 })
 export class ImageSelectorComponent {
   // Services
-  private readonly mockDataService = inject(MockDataService);
+  private readonly imageSearchService = inject(ImageSearchService);
 
   // Constants
   protected readonly ICONS = {
@@ -51,6 +51,8 @@ export class ImageSelectorComponent {
 
   // Inputs
   public readonly flashcard = input.required<Flashcard>();
+
+  public readonly noteType = input.required<NoteType>();
 
   public readonly currentIndex = input(0);
 
@@ -70,7 +72,9 @@ export class ImageSelectorComponent {
 
   protected readonly selectedImages = signal<FlashcardImage[]>([]);
 
-  private imageOffset = 0;
+  protected readonly isLoading = signal(false);
+
+  private imageOffset = 1;
 
   // Constructor
   public constructor() {
@@ -82,26 +86,47 @@ export class ImageSelectorComponent {
     });
   }
 
-  private initializeCard() {
-    const card = this.flashcard();
-    this.searchControl.setValue(card.customSearchPhrase || card.word);
-    this.images.set(this.mockDataService.generateMockImages(card.word));
+  protected getFlashcardTitle(): string {
+    const titleField = this.noteType().fields.find((f) => f.isTitle);
+    return titleField ? this.flashcard().fieldValues[titleField.name] || 'Word' : 'Word';
+  }
+
+  private async initializeCard() {
+    const card: Flashcard = this.flashcard();
+    const titleField: NoteTypeField | undefined = this.noteType().fields.find((f) => f.isTitle);
+    const word: string | undefined = titleField ? card.fieldValues[titleField.name] : undefined;
+
+    if (!word) {
+      console.error('No word can be used to search for images');
+      return;
+    }
+
+    this.searchControl.setValue(word);
     this.selectedImages.set(card.selectedImages || []);
-    this.imageOffset = 0;
+    this.imageOffset = 1;
+
+    this.isLoading.set(true);
+    const searchImages = await this.imageSearchService.searchImages(word, 1);
+    this.images.set(searchImages);
+    this.isLoading.set(false);
   }
 
-  protected search() {
+  protected async search() {
     const term = this.searchControl.value;
-    const newImages = this.mockDataService.generateMockImages(term, this.imageOffset);
-    this.images.set(newImages);
+    this.imageOffset = 1;
+    this.isLoading.set(true);
+    const searchImages = await this.imageSearchService.searchImages(term, 1);
+    this.images.set(searchImages);
+    this.isLoading.set(false);
   }
 
-  protected loadMore() {
-    const newOffset = this.imageOffset + 6;
-    this.imageOffset = newOffset;
+  protected async loadMore() {
+    this.imageOffset += IMAGES_PER_PAGE;
     const term = this.searchControl.value;
-    const moreImages = this.mockDataService.generateMockImages(term, newOffset);
+    this.isLoading.set(true);
+    const moreImages = await this.imageSearchService.searchImages(term, this.imageOffset);
     this.images.update((current) => [...current, ...moreImages]);
+    this.isLoading.set(false);
   }
 
   protected toggleImageSelection(image: FlashcardImage) {

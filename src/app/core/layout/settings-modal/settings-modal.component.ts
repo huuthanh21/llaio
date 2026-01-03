@@ -69,6 +69,8 @@ export class SettingsModalComponent implements OnInit {
   // Protected State
   protected readonly apiKeyControl = new FormControl('', { nonNullable: true });
 
+  protected readonly googleCseApiKeyControl = new FormControl('', { nonNullable: true });
+
   protected readonly nativeLanguageControl = new FormControl<Language>('Vietnamese', {
     nonNullable: true,
   });
@@ -82,12 +84,14 @@ export class SettingsModalComponent implements OnInit {
   public ngOnInit(): void {
     // Initialize form with stored values when component is created (modal opens)
     this.apiKeyControl.setValue(this.settingsStore.apiKey());
+    this.googleCseApiKeyControl.setValue(this.settingsStore.googleCseApiKey());
     this.nativeLanguageControl.setValue(this.languageStore.nativeLanguage());
     this.themeControl.setValue(this.themeStore.theme());
   }
 
   protected onSave(): void {
     this.settingsStore.setApiKey(this.apiKeyControl.value);
+    this.settingsStore.setGoogleCseApiKey(this.googleCseApiKeyControl.value);
     this.languageStore.setNativeLanguage(this.nativeLanguageControl.value);
     this.themeStore.setTheme(this.themeControl.value);
     this.closeModal.emit();

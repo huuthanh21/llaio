@@ -19,6 +19,10 @@
       </button>
     </div>
 
+    @if (error()) {
+      <p class="text-sm text-destructive">{{ error() }}</p>
+    }
+
     @if (words().length > 0) {
       <div class="flex flex-col gap-3">
         <div class="flex items-center justify-between">
@@ -57,8 +61,12 @@
             </app-badge>
           }
         </div>
-        <button class="w-full justify-center" (click)="submit()" appButton>
-          Create Flashcards
+        <button class="w-full justify-center" [disabled]="isLoading()" (click)="submit()" appButton>
+          @if (isLoading()) {
+            Generating...
+          } @else {
+            Create Flashcards
+          }
         </button>
       </div>
     }

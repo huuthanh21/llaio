@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
 import { Flashcard, FlashcardImage } from '../../models/flashcard.types';
+import { NoteType } from '../../models/note-type.model';
 import { ImageSelectorComponent } from '../image-selector/image-selector.component';
 
 @Component({
@@ -10,6 +11,8 @@ import { ImageSelectorComponent } from '../image-selector/image-selector.compone
 })
 export class ImageSelectionFlowComponent {
   public readonly flashcards = input<Flashcard[]>([]);
+
+  public readonly noteType = input.required<NoteType>();
 
   public readonly complete = output<Flashcard[]>();
 

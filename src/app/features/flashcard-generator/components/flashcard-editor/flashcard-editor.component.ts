@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, Component, effect, input, output, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  input,
+  output,
+  signal,
+} from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import {
   CardComponent,
@@ -11,6 +19,7 @@ import {
 import { ButtonDirective, InputDirective, TextareaDirective } from '@shared/directives';
 import { LucideAngularModule, X } from 'lucide-angular';
 import { Flashcard, FlashcardImage } from '../../models/flashcard.types';
+import { NoteType } from '../../models/note-type.model';
 
 @Component({
   selector: 'app-flashcard-editor',
@@ -39,25 +48,33 @@ export class FlashcardEditorComponent {
   // Inputs
   public readonly flashcard = input<Flashcard | null>(null);
 
+  public readonly noteType = input.required<NoteType>();
+
   // Outputs
   public readonly save = output<Flashcard>();
 
   public readonly cancelEdit = output();
 
-  // Public State
-  protected readonly form = new FormGroup({
-    word: new FormControl('', { nonNullable: true }),
-    definition: new FormControl('', { nonNullable: true }),
-    example: new FormControl('', { nonNullable: true }),
-  });
+  // Public State - dynamic form group
+  protected readonly form = signal<FormGroup>(new FormGroup({}));
 
   protected readonly editedImages = signal<FlashcardImage[]>([]);
+
+  protected readonly formReady = signal(false);
+
+  protected readonly editableFields = computed(() => {
+    if (!this.formReady()) {
+      return [];
+    }
+    return this.noteType().fields.filter((f) => f.fieldType !== 'image');
+  });
 
   // Constructor
   public constructor() {
     effect(() => {
       const card = this.flashcard();
-      if (card) {
+      const noteType = this.noteType();
+      if (card && noteType) {
         this.initializeForm();
       }
     });
@@ -65,34 +82,50 @@ export class FlashcardEditorComponent {
 
   private initializeForm() {
     const card = this.flashcard();
-    if (!card) return;
+    const noteType = this.noteType();
+    if (!card || !noteType) return;
 
-    this.form.patchValue({
-      word: card.word,
-      definition: card.definition,
-      example: card.example,
-    });
+    // Reset form ready state before rebuilding
+    this.formReady.set(false);
 
+    // Build form controls dynamically from note type fields
+    const controls: Record<string, FormControl<string>> = {};
+    for (const field of noteType.fields) {
+      // Skip image fields - they are handled separately
+      if (field.fieldType !== 'image') {
+        controls[field.name] = new FormControl(card.fieldValues[field.name] || '', {
+          nonNullable: true,
+        });
+      }
+    }
+
+    this.form.set(new FormGroup(controls));
     this.editedImages.set([...card.selectedImages]);
+    this.formReady.set(true);
   }
 
   protected removeImage(imageId: string) {
     this.editedImages.update((current) => current.filter((img) => img.id !== imageId));
   }
 
-  public onCancel() {
+  protected discardChanges() {
     this.cancelEdit.emit();
   }
 
-  public onSave() {
+  protected saveChanges() {
     const card = this.flashcard();
-    if (!card || this.form.invalid) return;
+    const formGroup = this.form();
+    if (!card || formGroup.invalid) return;
+
+    // Build fieldValues from form controls
+    const fieldValues: Record<string, string> = {};
+    for (const fieldName of Object.keys(formGroup.controls)) {
+      fieldValues[fieldName] = (formGroup.get(fieldName) as FormControl<string>).value;
+    }
 
     const updatedFlashcard: Flashcard = {
       ...card,
-      word: this.form.controls.word.value,
-      definition: this.form.controls.definition.value,
-      example: this.form.controls.example.value,
+      fieldValues,
       selectedImages: this.editedImages(),
     };
 

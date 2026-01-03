@@ -1,6 +1,7 @@
 @if (currentCard()) {
   <app-image-selector
     [flashcard]="currentCard()!"
+    [noteType]="noteType()"
     [currentIndex]="currentIndex()"
     [totalCards]="flashcards().length"
     (imagesSelected)="selectCardImages($event)"

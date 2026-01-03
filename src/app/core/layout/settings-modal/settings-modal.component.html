@@ -29,6 +29,24 @@
   </div>
 
   <div class="flex flex-col">
+    <label class="mb-2 block text-label-13" for="google-cse-key">
+      <strong>Google Custom Search API Key</strong>
+    </label>
+    <input
+      id="google-cse-key"
+      [formControl]="googleCseApiKeyControl"
+      type="password"
+      placeholder="Enter your Google CSE API key"
+      autocomplete="off"
+      appInput
+      spellcheck="false"
+    />
+    <p class="mt-2 text-label-13 text-muted-foreground">
+      Used for image search in flashcard generation.
+    </p>
+  </div>
+
+  <div class="flex flex-col">
     <label class="mb-2 block text-label-13" for="theme-select">
       <strong>Theme</strong>
     </label>
