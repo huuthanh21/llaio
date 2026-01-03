@@ -114,7 +114,10 @@
 
   <app-content-status [isLoading]="isLoading()" [error]="error()" [isEmpty]="!definition()">
     <div class="relative rounded-lg border border-border bg-background p-6 shadow-sm">
-      <article class="prose dark:prose-invert" [innerHTML]="definition()"></article>
+      <article
+        class="prose [--tw-prose-body:var(--foreground)] [--tw-prose-bold:var(--foreground)] dark:prose-invert prose-headings:text-heading-24 prose-headings:leading-[inherit] prose-p:text-copy-16 prose-p:leading-[inherit] prose-strong:text-foreground prose-li:text-label-16 prose-li:leading-[inherit]"
+        [innerHTML]="definition()"
+      ></article>
     </div>
   </app-content-status>
 </div>
