@@ -108,7 +108,7 @@ export class AnkiExportService {
    * Uses local proxy in dev, production proxy on Render in prod.
    */
   private async fetchImageWithProxy(imageUrl: string): Promise<string | null> {
-    const proxyBaseUrl = isDevMode() ? 'http://localhost:3000' : 'https://llaio-api.onrender.com';
+    const proxyBaseUrl = isDevMode() ? 'http://localhost:3000' : 'https://llaio-api.vercel.app';
     const proxyUrl = `${proxyBaseUrl}/proxy?url=${encodeURIComponent(imageUrl)}`;
 
     try {
