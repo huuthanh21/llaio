@@ -53,6 +53,8 @@ export class DropdownComponent implements ControlValueAccessor {
   // View Queries
   private readonly triggerRef = viewChild<ElementRef<HTMLButtonElement>>('triggerBtn');
 
+  private readonly menuRef = viewChild<ElementRef<HTMLDivElement>>('menu');
+
   // Protected State
   protected readonly isOpen = signal(false);
 
@@ -60,7 +62,7 @@ export class DropdownComponent implements ControlValueAccessor {
 
   protected readonly disabled = signal(false);
 
-  protected readonly menuMaxHeight = signal<string | null>(null);
+  protected readonly menuStyles = signal<Record<string, string>>({});
 
   // Private State
   private onChange: (value: string) => void = () => {
@@ -95,6 +97,29 @@ export class DropdownComponent implements ControlValueAccessor {
         this.selectedValue.set(val);
       }
     });
+
+    // Close on scroll to prevent detachment but allow internal scrolling
+    effect((onCleanup) => {
+      if (!this.isOpen()) {
+        return;
+      }
+
+      const handleScroll = (event: Event) => {
+        const menuEl = this.menuRef()?.nativeElement;
+        if (menuEl && event.target instanceof Node && menuEl.contains(event.target)) {
+          return;
+        }
+        this.closeDropdown();
+      };
+
+      window.addEventListener('scroll', handleScroll, { capture: true, passive: true });
+      window.addEventListener('resize', handleScroll, { passive: true });
+
+      onCleanup(() => {
+        window.removeEventListener('scroll', handleScroll, { capture: true });
+        window.removeEventListener('resize', handleScroll);
+      });
+    });
   }
 
   public writeValue(value: string): void {
@@ -119,22 +144,48 @@ export class DropdownComponent implements ControlValueAccessor {
     this.isOpen.set(!wasOpen);
 
     if (!wasOpen) {
-      // Opening: calculate available space below trigger
-      this.calculateMenuMaxHeight();
+      // Opening
+      this.calculatePosition();
     } else {
       this.onTouched();
     }
   }
 
-  private calculateMenuMaxHeight(): void {
+  private calculatePosition(): void {
     const triggerEl = this.triggerRef()?.nativeElement;
     if (!triggerEl) return;
 
     const rect = triggerEl.getBoundingClientRect();
-    const spaceBelow = window.innerHeight - rect.bottom;
-    // 20px breathing room, minimum 100px
-    const maxHeight = Math.max(spaceBelow - 20, 100);
-    this.menuMaxHeight.set(`${maxHeight}px`);
+    const viewportHeight = window.innerHeight;
+    const viewportWidth = window.innerWidth;
+
+    // Default: Open down
+    const top = rect.bottom + 4;
+    // Space below
+    const maxHeight = Math.max(viewportHeight - top - 20, 100);
+
+    // If not enough space below (less than 150px) and more space above, open up?
+    // For now keeping simpler logic as per plan: just cap max height.
+
+    const styles: Record<string, string> = {
+      top: `${top}px`,
+      'max-height': `${maxHeight}px`,
+    };
+
+    if (this.variant() === 'full') {
+      styles['width'] = `${rect.width}px`;
+      styles['left'] = `${rect.left}px`;
+    } else {
+      if (this.align() === 'right') {
+        styles['right'] = `${viewportWidth - rect.right}px`;
+      } else {
+        styles['left'] = `${rect.left}px`;
+      }
+      // Min width for non-full variant
+      styles['min-width'] = '11.25rem'; // 45 * 0.25rem = 180px
+    }
+
+    this.menuStyles.set(styles);
   }
 
   protected selectOption(option: string): void {
