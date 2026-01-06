@@ -32,10 +32,9 @@
 
   @if (isOpen()) {
     <div
-      class="absolute top-[calc(100%+4px)] left-0 z-1000 w-full min-w-45 animate-dropdown-fade-in overflow-y-auto overscroll-contain rounded-md border border-border bg-popover p-1 shadow-lg"
-      [class.left-auto]="align() === 'right'"
-      [class.right-0]="align() === 'right'"
-      [style.max-height]="menuMaxHeight()"
+      class="fixed z-1000 animate-dropdown-fade-in overflow-y-auto overscroll-contain rounded-md border border-border bg-popover p-1 shadow-lg"
+      #menu
+      [style]="menuStyles()"
       role="listbox"
     >
       @for (option of normalizedOptions(); track option.value) {
