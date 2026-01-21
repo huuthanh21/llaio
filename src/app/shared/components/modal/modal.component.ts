@@ -69,7 +69,7 @@ export class ModalComponent {
   public readonly ariaLabelledBy = input<string>('');
 
   // Outputs
-  public readonly closeModal = output<void>();
+  public readonly closeModal = output();
 
   // Computed
   protected readonly maxWidth = computed(() => MODAL_SIZE_MAP[this.size()]);
