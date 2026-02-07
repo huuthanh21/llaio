@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, input, output, signal } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { LucideAngularModule, X } from 'lucide-angular';
+import { Info, LucideAngularModule, X } from 'lucide-angular';
 import { BadgeComponent } from '../../../../shared/components/badge/badge.component';
 import {
   CardComponent,
@@ -33,6 +33,7 @@ export class WordInputComponent {
   // Constants
   protected readonly ICONS = {
     X,
+    Info,
   };
 
   // Inputs
