@@ -15,6 +15,8 @@ interface ImageSelectorProps {
   onSelect: (flashcard: Flashcard) => void;
 }
 
+const MAX_CUSTOM_IMAGES = 2;
+
 function getWordFromFlashcard(flashcard: Flashcard, noteType: NoteType): string {
   const firstField = noteType.fields[0];
 
@@ -23,6 +25,11 @@ function getWordFromFlashcard(flashcard: Flashcard, noteType: NoteType): string 
   }
 
   return flashcard.fieldValues[firstField.name] ?? '';
+}
+
+function isPastedImage(image: FlashcardImage): boolean {
+  // Keep URL-prefix fallback for flashcards saved before `source` metadata existed.
+  return image.source === 'pasted' || image.url.startsWith('data:image/');
 }
 
 function toFlashcardImage(result: ImageSearchResult): FlashcardImage {
@@ -146,11 +153,7 @@ export function ImageSelector({ flashcard, noteType, onSelect }: ImageSelectorPr
   useEffect(() => {
     const initialQuery = cardWord.trim();
     setSearchQuery(initialQuery);
-    setPastedImages(
-      flashcard.selectedImages.filter(
-        (image) => image.source === 'pasted' || image.url.startsWith('data:image/'),
-      ),
-    );
+    setPastedImages(flashcard.selectedImages.filter((image) => isPastedImage(image)));
     setSelectedImages(flashcard.selectedImages.map((image) => image.url));
     setPasteError(null);
     void runSearch(initialQuery);
@@ -182,7 +185,7 @@ export function ImageSelector({ flashcard, noteType, onSelect }: ImageSelectorPr
         let nextSelected = previousSelected;
         if (isSelected) {
           nextSelected = previousSelected.filter((selectedUrl) => selectedUrl !== imageUrl);
-        } else if (previousSelected.length < 2) {
+        } else if (previousSelected.length < MAX_CUSTOM_IMAGES) {
           nextSelected = [...previousSelected, imageUrl];
         }
 
@@ -209,9 +212,11 @@ export function ImageSelector({ flashcard, noteType, onSelect }: ImageSelectorPr
         return;
       }
 
-      const remainingSlots = 2 - pastedImages.length;
+      const remainingSlots = MAX_CUSTOM_IMAGES - pastedImages.length;
       if (remainingSlots <= 0) {
-        setPasteError('You can add up to 2 of your own images per flashcard.');
+        setPasteError(
+          `You have reached the limit of ${MAX_CUSTOM_IMAGES} of your own images per flashcard.`,
+        );
         return;
       }
 
@@ -223,7 +228,9 @@ export function ImageSelector({ flashcard, noteType, onSelect }: ImageSelectorPr
         );
         setPastedImages((previousImages) => [...previousImages, ...nextImages]);
         setPasteError(
-          imageFiles.length > remainingSlots ? 'Only the first 2 pasted images were added.' : null,
+          imageFiles.length > remainingSlots
+            ? `Only the first ${remainingSlots} pasted image${remainingSlots > 1 ? 's were' : ' was'} added.`
+            : null,
         );
       } catch (error) {
         if (error instanceof Error) {
@@ -243,7 +250,16 @@ export function ImageSelector({ flashcard, noteType, onSelect }: ImageSelectorPr
         return;
       }
 
-      event.preventDefault();
+      const activeElement = document.activeElement;
+      const isTypingContext =
+        activeElement instanceof HTMLInputElement || activeElement instanceof HTMLTextAreaElement;
+      const isContentEditable =
+        activeElement instanceof HTMLElement && activeElement.isContentEditable;
+
+      if (!isTypingContext && !isContentEditable) {
+        event.preventDefault();
+      }
+
       void appendPastedFiles(files);
     };
 
@@ -263,10 +279,15 @@ export function ImageSelector({ flashcard, noteType, onSelect }: ImageSelectorPr
         title: 'Selected image',
       })),
     ];
+    const seenUrls = new Set<string>();
 
-    return mergedImages.filter(
-      (image, index, source) => source.findIndex((item) => item.url === image.url) === index,
-    );
+    return mergedImages.filter((image) => {
+      if (seenUrls.has(image.url)) {
+        return false;
+      }
+      seenUrls.add(image.url);
+      return true;
+    });
   }, [images, pastedImages]);
 
   return (
@@ -274,7 +295,7 @@ export function ImageSelector({ flashcard, noteType, onSelect }: ImageSelectorPr
       <div className="space-y-1.5">
         <h3 className="text-heading-20">{cardWord || 'Flashcard'}</h3>
         <p className="text-[14px] text-muted-foreground">
-          Select up to 2 images for this flashcard.
+          Select up to {MAX_CUSTOM_IMAGES} images for this flashcard.
         </p>
       </div>
 
@@ -314,7 +335,8 @@ export function ImageSelector({ flashcard, noteType, onSelect }: ImageSelectorPr
             </span>
           </div>
           <p className="text-[12px] text-muted-foreground">
-            Add up to 2 of your own images for this card. Works on desktop and mobile file pickers.
+            Add up to {MAX_CUSTOM_IMAGES} of your own images for this card. Works on desktop and
+            mobile file pickers.
           </p>
           <input
             ref={fileInputRef}
@@ -333,8 +355,8 @@ export function ImageSelector({ flashcard, noteType, onSelect }: ImageSelectorPr
         </div>
 
         <p className="text-[13px] text-muted-foreground">
-          <span className="font-medium text-foreground">{selectedImages.length}</span> / 2 images
-          selected
+          <span className="font-medium text-foreground">{selectedImages.length}</span> /{' '}
+          {MAX_CUSTOM_IMAGES} images selected
         </p>
 
         {pasteError ? (
@@ -355,7 +377,7 @@ export function ImageSelector({ flashcard, noteType, onSelect }: ImageSelectorPr
           </div>
         ) : null}
 
-        {!isLoading && allImages.length === 0 ? (
+        {!isLoading && !searchError && allImages.length === 0 ? (
           <div className="border-border/60 bg-surface-raised/50 rounded-lg border border-dashed p-8 text-center text-[14px] text-muted-foreground">
             No images yet. Search, paste, or choose images to continue.
           </div>
@@ -365,7 +387,7 @@ export function ImageSelector({ flashcard, noteType, onSelect }: ImageSelectorPr
           <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
             {allImages.map((image) => {
               const isSelected = selectedImages.includes(image.url);
-              const disableNewSelection = !isSelected && selectedImages.length >= 2;
+              const disableNewSelection = !isSelected && selectedImages.length >= MAX_CUSTOM_IMAGES;
 
               return (
                 <button
