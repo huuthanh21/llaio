@@ -1,0 +1,236 @@
+@import './styles/typography.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: 'Geist Sans';
+  src: url('/fonts/Geist-Variable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-display: swap;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Geist Mono';
+  src: url('/fonts/GeistMono-Variable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-display: swap;
+  font-style: normal;
+}
+
+@layer base {
+  :root {
+    color-scheme: light;
+
+    /* Warm-tinted neutrals — chroma 0.004 at hue 80 (warm stone) */
+    --background: oklch(0.988 0.004 80);
+    --background-secondary: oklch(0.968 0.003 80);
+    --surface-raised: oklch(0.995 0.003 80);
+    --surface-inset: oklch(0.955 0.004 80);
+    --foreground: oklch(0.145 0.005 80);
+    --foreground-light: oklch(0.42 0.004 80);
+    --card: oklch(0.992 0.003 80);
+    --card-foreground: oklch(0.145 0.005 80);
+    --popover: oklch(0.995 0.003 80);
+    --popover-foreground: oklch(0.145 0.005 80);
+    --primary: oklch(0.17 0.005 80);
+    --primary-hover: oklch(0.28 0.004 80);
+    --primary-foreground: oklch(0.97 0.003 80);
+    --secondary: oklch(0.96 0.003 80);
+    --secondary-foreground: oklch(0.17 0.005 80);
+    --muted: oklch(0.955 0.003 80);
+    --muted-foreground: oklch(0.5 0.004 80);
+    --accent: oklch(0.948 0.003 80);
+    --accent-hover: oklch(0.928 0.004 80);
+    --accent-active: oklch(0.908 0.004 80);
+    --accent-foreground: oklch(0.145 0.005 80);
+    --destructive: oklch(0.55 0.2 27);
+    --destructive-foreground: oklch(0.97 0.003 80);
+    --success: oklch(0.55 0.15 145);
+    --border: oklch(0.91 0.003 80);
+    --border-hover: oklch(0.82 0.004 80);
+    --border-active: oklch(0.72 0.004 80);
+    --input: oklch(0.928 0.003 80);
+    --ring: oklch(0.42 0.004 80);
+    --radius: 6px;
+    --highlight: oklch(0.938 0.004 80);
+
+    /* Sidebar */
+    --sidebar: oklch(0.982 0.003 80);
+    --sidebar-foreground: oklch(0.145 0.005 80);
+    --sidebar-primary: oklch(0.17 0.005 80);
+    --sidebar-primary-foreground: oklch(0.97 0.003 80);
+    --sidebar-accent: oklch(0.94 0.003 80);
+    --sidebar-accent-foreground: oklch(0.145 0.005 80);
+    --sidebar-border: oklch(0.91 0.003 80);
+    --sidebar-ring: oklch(0.5 0.004 80);
+  }
+
+  .dark {
+    color-scheme: dark;
+
+    /* Warm-tinted dark neutrals */
+    --background: oklch(0.135 0.005 80);
+    --background-secondary: oklch(0.115 0.004 80);
+    --surface-raised: oklch(0.18 0.005 80);
+    --surface-inset: oklch(0.1 0.004 80);
+    --foreground: oklch(0.92 0.003 80);
+    --foreground-light: oklch(0.6 0.004 80);
+    --card: oklch(0.17 0.005 80);
+    --card-foreground: oklch(0.92 0.003 80);
+    --popover: oklch(0.165 0.005 80);
+    --popover-foreground: oklch(0.92 0.003 80);
+    --primary: oklch(0.92 0.003 80);
+    --primary-hover: oklch(0.8 0.003 80);
+    --primary-foreground: oklch(0.135 0.005 80);
+    --secondary: oklch(0.19 0.004 80);
+    --secondary-foreground: oklch(0.92 0.003 80);
+    --muted: oklch(0.2 0.004 80);
+    --muted-foreground: oklch(0.52 0.004 80);
+    --accent: oklch(0.19 0.004 80);
+    --accent-hover: oklch(0.23 0.005 80);
+    --accent-active: oklch(0.27 0.005 80);
+    --accent-foreground: oklch(0.92 0.003 80);
+    --destructive: oklch(0.55 0.2 27);
+    --destructive-foreground: oklch(0.97 0.003 80);
+    --success: oklch(0.55 0.15 145);
+    --border: oklch(0.255 0.004 80);
+    --border-hover: oklch(0.35 0.004 80);
+    --border-active: oklch(0.48 0.004 80);
+    --input: oklch(0.2 0.004 80);
+    --ring: oklch(0.6 0.004 80);
+    --highlight: oklch(0.22 0.005 80);
+
+    --sidebar: oklch(0.155 0.005 80);
+    --sidebar-foreground: oklch(0.92 0.003 80);
+    --sidebar-primary: oklch(0.92 0.003 80);
+    --sidebar-primary-foreground: oklch(0.135 0.005 80);
+    --sidebar-accent: oklch(0.21 0.004 80);
+    --sidebar-accent-foreground: oklch(0.92 0.003 80);
+    --sidebar-border: oklch(0.255 0.004 80);
+    --sidebar-ring: oklch(0.52 0.004 80);
+  }
+
+  * {
+    border-color: var(--border);
+    outline-color: oklch(from var(--ring) l c h / 50%);
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: 'Geist Sans', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--border-hover);
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: var(--border);
+}
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: var(--border-hover);
+}
+
+/* Streaming Cursor Animation */
+.streaming-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1.1em;
+  background-color: var(--foreground);
+  margin-left: 2px;
+  vertical-align: text-bottom;
+  animation: blink 0.8s steps(2, start) infinite;
+}
+
+@keyframes blink {
+  to {
+    opacity: 0;
+  }
+}
+
+/* Global transitions */
+@layer utilities {
+  .transition-base {
+    transition-property: color, background-color, border-color, opacity, transform;
+    transition-duration: 150ms;
+    transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .transition-subtle {
+    transition-property: color, background-color, border-color, opacity;
+    transition-duration: 120ms;
+    transition-timing-function: ease-out;
+  }
+}
+
+/* Content entrance animation */
+@keyframes content-enter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-content-enter {
+  animation: content-enter 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Focus ring utility */
+@layer utilities {
+  .focus-ring {
+    @apply focus-visible:ring-ring/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-offset-background;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .animate-content-enter {
+    animation: none;
+  }
+  .streaming-cursor {
+    animation: none;
+    opacity: 1;
+  }
+}
+
+/* Nav indicator */
+.nav-indicator {
+  position: relative;
+}
+.nav-indicator::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%) scaleY(0);
+  width: 3px;
+  height: 60%;
+  border-radius: 0 2px 2px 0;
+  background-color: var(--foreground);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.nav-indicator-active::before {
+  transform: translateY(-50%) scaleY(1);
+}

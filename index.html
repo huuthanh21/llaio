@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+    <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#ffffff" />
+    <meta name="description" content="llaio - scholarly language learning utility" />
+    <title>llaio</title>
+  </head>
+  <body>
+    <!-- Genanki Dependencies -->
+    <script src="/libs/genanki/sql.js"></script>
+    <script src="/libs/genanki/FileSaver.min.js"></script>
+    <script src="/libs/genanki/jszip.min.js"></script>
+    <script src="/libs/genanki/genanki.js"></script>
+    <script>
+      var config = {
+        locateFile: (filename) => `/libs/genanki/${filename}`,
+      };
+      var SQL;
+      initSqlJs(config).then(function (sql) {
+        SQL = sql;
+      });
+    </script>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

@@ -3,7 +3,13 @@
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit"
   },
-  "eslint.validate": ["javascript", "typescript", "html"],
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact",
+    "html"
+  ],
   "css.lint.unknownAtRules": "ignore",
   "[html]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
@@ -11,7 +17,13 @@
   "[typescript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
   "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascriptreact]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "[json]": {
@@ -19,12 +31,7 @@
   },
   "tailwindCSS.experimental.classRegex": [
     "tw`([^`]*)`",
-    "class:\\s*['`]([^'`]*)['`]", // class: 'foo bar' or class: `foo bar`
-    ["class:\\s*'([^']*)", "'\\[class\\.([^\\]\\s']*)'"],
-    ["'\\[class\\]': '([^']*)'", "\"([^\"]*)\""], // '[class]': 'foo ? "bar" : "baz"'
-    ["'\\[class\\]': `([^`]*)`", "'([^']*)'"], // '[class]': `foo ? 'bar' : 'baz'`
-    "\\[class\\.([^\\]]*)\\]", // '[class.foo]': 'bar' or [class.foo]="bar"
-    "'animate\\.(?:enter|leave)': '([^']*)'" // 'animate.enter': 'foo bar' or 'animate.leave': 'foo bar'
+    "class:\\s*['`]([^'`]*)['`]"
   ],
   "json.schemas": [
     {

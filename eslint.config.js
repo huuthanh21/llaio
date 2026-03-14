@@ -1,77 +1,43 @@
-// @ts-check
-import eslint from '@eslint/js';
-import stylistic from '@stylistic/eslint-plugin';
-import angular from 'angular-eslint';
-import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
-import { defineConfig } from 'eslint/config';
+import js from '@eslint/js';
+import globals from 'globals';
+import reactHooks from 'eslint-plugin-react-hooks';
+import reactRefresh from 'eslint-plugin-react-refresh';
 import tseslint from 'typescript-eslint';
+import pluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
 
-export default defineConfig(
+export default tseslint.config(
   {
-    ignores: ['.angular/**', 'dist/**', 'node_modules/**'],
+    ignores: ['dist', 'node_modules', '.bun-cache', 'playwright-report', 'test-results'],
   },
   {
-    files: ['**/*.ts'],
-    extends: [
-      eslint.configs.recommended,
-      ...tseslint.configs.strict,
-      ...tseslint.configs.stylistic,
-      ...angular.configs.tsRecommended,
-      eslintPluginPrettierRecommended,
-    ],
-    plugins: {
-      '@stylistic': stylistic,
+    extends: [js.configs.recommended, ...tseslint.configs.recommended],
+    files: ['**/*.{ts,tsx}'],
+    languageOptions: {
+      ecmaVersion: 2020,
+      globals: globals.browser,
     },
-    processor: angular.processInlineTemplates,
+    plugins: {
+      'react-hooks': reactHooks,
+      'react-refresh': reactRefresh,
+    },
     rules: {
-      '@typescript-eslint/explicit-member-accessibility': 'error',
-      '@stylistic/lines-between-class-members': 'error',
-      '@angular-eslint/directive-selector': [
-        'error',
-        {
-          type: 'attribute',
-          prefix: ['app', 'lib'],
-          style: 'camelCase',
-        },
-      ],
-      '@angular-eslint/component-selector': [
-        'error',
-        {
-          type: 'element',
-          prefix: ['app', 'lib'],
-          style: 'kebab-case',
-        },
-      ],
-
-      '@typescript-eslint/no-extraneous-class': [
-        'error',
-        {
-          allowWithDecorator: true,
-        },
-      ],
+      ...reactHooks.configs.recommended.rules,
       '@typescript-eslint/no-unused-vars': [
         'error',
         {
-          args: 'all',
           argsIgnorePattern: '^_',
-          caughtErrors: 'all',
-          caughtErrorsIgnorePattern: '^_',
-          destructuredArrayIgnorePattern: '^_',
           varsIgnorePattern: '^_',
-          ignoreRestSiblings: true,
         },
       ],
+      'react-hooks/set-state-in-effect': 'off',
+      'react-refresh/only-export-components': ['error', { allowConstantExport: true }],
     },
   },
   {
-    files: ['**/*.html'],
-    extends: [
-      ...angular.configs.templateRecommended,
-      ...angular.configs.templateAccessibility,
-      eslintPluginPrettierRecommended,
-    ],
+    files: ['src/components/ui/*.{ts,tsx}'],
     rules: {
-      'prettier/prettier': ['error', { parser: 'angular' }],
+      'react-refresh/only-export-components': 'off',
     },
   },
+  pluginPrettierRecommended,
 );

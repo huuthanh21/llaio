@@ -1,206 +1,141 @@
-/* ============================================
-    Geist Typography Utilities
-    ============================================ */
+@layer utilities {
+  .text-heading-32 {
+    font-size: clamp(26px, 2vw + 16px, 32px);
+    line-height: 1.2;
+    letter-spacing: -0.03em;
+    font-weight: 700;
+    color: var(--foreground);
+  }
 
-/* Headings - Used to introduce pages or sections */
-@utility text-heading-32 {
-  font-size: 32px;
-  line-height: 40px;
-  letter-spacing: -1.28px;
-  font-weight: 600;
-  color: var(--foreground);
+  .text-heading-24 {
+    font-size: clamp(22px, 1.5vw + 14px, 24px);
+    line-height: 1.3;
+    letter-spacing: -0.025em;
+    font-weight: 600;
+    color: var(--foreground);
+  }
 
-  & > strong {
+  .text-heading-20 {
+    font-size: 20px;
+    line-height: 1.35;
+    letter-spacing: -0.02em;
+    font-weight: 600;
+    color: var(--foreground);
+  }
+
+  .text-heading-16 {
+    font-size: 16px;
+    line-height: 1.4;
+    letter-spacing: -0.015em;
+    font-weight: 600;
+    color: var(--foreground);
+  }
+
+  .text-heading-14 {
+    font-size: 14px;
+    line-height: 1.4;
+    letter-spacing: -0.01em;
+    font-weight: 600;
+    color: var(--foreground);
+  }
+
+  .text-button-16 {
+    font-size: 16px;
+    line-height: 1.25;
     font-weight: 500;
+    letter-spacing: -0.01em;
+    color: var(--foreground);
+  }
+
+  .text-button-14 {
+    font-size: 14px;
+    line-height: 1.25;
+    font-weight: 500;
+    letter-spacing: -0.005em;
+    color: var(--foreground);
+  }
+
+  .text-button-12 {
+    font-size: 12px;
+    line-height: 1.35;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    color: var(--foreground);
+  }
+
+  .text-label-20 {
+    font-size: 20px;
+    line-height: 1.5;
+    font-weight: 400;
+    color: var(--foreground);
+  }
+
+  .text-label-18 {
+    font-size: 18px;
+    line-height: 1.4;
+    font-weight: 400;
+    color: var(--foreground);
+  }
+
+  .text-label-16 {
+    font-size: 16px;
+    line-height: 1.4;
+    font-weight: 400;
     color: var(--foreground-light);
   }
-}
 
-@utility text-heading-24 {
-  font-size: 24px;
-  line-height: 32px;
-  letter-spacing: -0.96px;
-  font-weight: 600;
-  color: var(--foreground);
-
-  & > strong {
-    font-weight: 500;
+  .text-label-14 {
+    font-size: 14px;
+    line-height: 1.45;
+    font-weight: 400;
     color: var(--foreground-light);
   }
-}
 
-@utility text-heading-20 {
-  font-size: 20px;
-  line-height: 26px;
-  letter-spacing: -0.4px;
-  font-weight: 600;
-  color: var(--foreground);
-
-  & > strong {
-    font-weight: 500;
+  .text-label-13 {
+    font-size: 13px;
+    line-height: 1.45;
+    font-weight: 400;
     color: var(--foreground-light);
   }
-}
 
-@utility text-heading-16 {
-  font-size: 16px;
-  line-height: 24px;
-  letter-spacing: -0.32px;
-  font-weight: 600;
-  color: var(--foreground);
-
-  & > strong {
-    font-weight: 500;
+  .text-copy-24 {
+    font-size: 24px;
+    line-height: 1.5;
+    font-weight: 400;
     color: var(--foreground-light);
   }
-}
 
-@utility text-heading-14 {
-  font-size: 14px;
-  line-height: 20px;
-  letter-spacing: -0.28px;
-  font-weight: 600;
-  color: var(--foreground);
-}
-
-/* Buttons - Only for button components */
-@utility text-button-16 {
-  font-size: 16px;
-  line-height: 20px;
-  font-weight: 500;
-  color: var(--foreground);
-}
-
-@utility text-button-14 {
-  font-size: 14px;
-  line-height: 20px;
-  font-weight: 500;
-  color: var(--foreground);
-}
-
-@utility text-button-12 {
-  font-size: 12px;
-  line-height: 16px;
-  font-weight: 500;
-  color: var(--foreground);
-}
-
-/* Labels - Designed for single-lines with ample line-height */
-@utility text-label-20 {
-  font-size: 20px;
-  line-height: 32px;
-  font-weight: 400;
-  color: var(--foreground);
-}
-
-@utility text-label-18 {
-  font-size: 18px;
-  line-height: 20px;
-  font-weight: 400;
-  color: var(--foreground);
-}
-
-@utility text-label-16 {
-  font-size: 16px;
-  line-height: 20px;
-  font-weight: 400;
-  color: var(--foreground-light);
-
-  & > strong {
-    font-weight: 500;
+  .text-copy-20 {
+    font-size: 20px;
+    line-height: 1.6;
+    font-weight: 400;
+    color: var(--foreground-light);
   }
-}
 
-@utility text-label-14 {
-  font-size: 14px;
-  line-height: 20px;
-  font-weight: 400;
-  color: var(--foreground-light);
-
-  & > strong {
-    font-weight: 500;
+  .text-copy-18 {
+    font-size: 18px;
+    line-height: 1.55;
+    font-weight: 400;
+    color: var(--foreground-light);
   }
-}
 
-@utility text-label-13 {
-  font-size: 13px;
-  line-height: 20px;
-  font-weight: 400;
-  color: var(--foreground-light);
-
-  & > strong {
-    font-weight: 500;
+  .text-copy-16 {
+    font-size: 16px;
+    line-height: 1.5;
+    font-weight: 400;
+    color: var(--foreground-light);
   }
-}
 
-/* Copy - Designed for multiple lines with higher line-height */
-@utility text-copy-24 {
-  font-size: 24px;
-  line-height: 36px;
-  font-weight: 400;
-  color: var(--foreground-light);
-
-  & > strong {
-    font-weight: 500;
-    color: var(--foreground);
+  .text-copy-14 {
+    font-size: 14px;
+    line-height: 1.45;
+    font-weight: 400;
+    color: var(--foreground-light);
   }
-}
 
-@utility text-copy-20 {
-  font-size: 20px;
-  line-height: 36px;
-  font-weight: 400;
-  color: var(--foreground-light);
-
-  & > strong {
-    font-weight: 500;
-    color: var(--foreground);
-  }
-}
-
-@utility text-copy-18 {
-  font-size: 18px;
-  line-height: 28px;
-  font-weight: 400;
-  color: var(--foreground-light);
-
-  & > strong {
-    font-weight: 500;
-    color: var(--foreground);
-  }
-}
-
-@utility text-copy-16 {
-  font-size: 16px;
-  line-height: 24px;
-  font-weight: 400;
-  color: var(--foreground-light);
-
-  & > strong {
-    font-weight: 500;
-    color: var(--foreground);
-  }
-}
-
-@utility text-copy-14 {
-  font-size: 14px;
-  line-height: 20px;
-  font-weight: 400;
-  color: var(--foreground-light);
-
-  & > strong {
-    font-weight: 500;
-    color: var(--foreground);
-  }
-}
-
-@utility text-copy-13 {
-  font-size: 13px;
-  line-height: 18px;
-  font-weight: 400;
-
-  & > strong {
-    font-weight: 500;
-    color: var(--foreground);
+  .text-copy-13 {
+    font-size: 13px;
+    line-height: 1.4;
+    font-weight: 400;
   }
 }
