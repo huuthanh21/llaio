@@ -5,6 +5,7 @@ export interface FlashcardImage {
   url: string;
   thumbnail: string;
   title: string;
+  source?: 'search' | 'pasted';
 }
 
 /**

@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Check, Search } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Check, Clipboard, ImagePlus, Search } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -31,15 +31,50 @@ function toFlashcardImage(result: ImageSearchResult): FlashcardImage {
     url: result.link,
     thumbnail: result.thumbnailLink,
     title: 'Selected image',
+    source: 'search',
   };
+}
+
+function fileToFlashcardImage(file: File): Promise<FlashcardImage> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      const dataUrl = reader.result;
+      if (typeof dataUrl !== 'string') {
+        reject(new Error('Unsupported image format.'));
+        return;
+      }
+
+      resolve({
+        id: dataUrl,
+        url: dataUrl,
+        thumbnail: dataUrl,
+        title: file.name || 'Pasted image',
+        source: 'pasted',
+      });
+    };
+
+    reader.onerror = () => {
+      reject(new Error('Could not process the pasted image.'));
+    };
+
+    reader.readAsDataURL(file);
+  });
 }
 
 function resolveSelectedImages(
   selectedUrls: string[],
   searchResults: ImageSearchResult[],
+  pastedImages: FlashcardImage[],
   existingSelected: FlashcardImage[],
 ): FlashcardImage[] {
   return selectedUrls.map((url) => {
+    const fromPasted = pastedImages.find((image) => image.url === url);
+    if (fromPasted) {
+      return fromPasted;
+    }
+
     const fromResults = searchResults.find((result) => result.link === url);
     if (fromResults) {
       return toFlashcardImage(fromResults);
@@ -64,9 +99,12 @@ export function ImageSelector({ flashcard, noteType, onSelect }: ImageSelectorPr
 
   const [searchQuery, setSearchQuery] = useState('');
   const [images, setImages] = useState<ImageSearchResult[]>([]);
+  const [pastedImages, setPastedImages] = useState<FlashcardImage[]>([]);
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [searchError, setSearchError] = useState<string | null>(null);
+  const [pasteError, setPasteError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const cardWord = useMemo(() => getWordFromFlashcard(flashcard, noteType), [flashcard, noteType]);
 
@@ -76,27 +114,27 @@ export function ImageSelector({ flashcard, noteType, onSelect }: ImageSelectorPr
 
       if (!trimmedQuery) {
         setImages([]);
-        setError(null);
+        setSearchError(null);
         return;
       }
 
       if (!googleCseApiKey) {
         setImages([]);
-        setError('Google CSE API key is missing. Add it in Settings to search images.');
+        setSearchError('Google CSE API key is missing. Add it in Settings to search images.');
         return;
       }
 
       setIsLoading(true);
-      setError(null);
+      setSearchError(null);
 
       try {
         const results = await searchImages(trimmedQuery, googleCseApiKey, GOOGLE_CSE_ID);
         setImages(results);
       } catch (err) {
         if (err instanceof Error) {
-          setError(err.message);
+          setSearchError(err.message);
         } else {
-          setError('Image search failed. Please try again.');
+          setSearchError('Image search failed. Please try again.');
         }
       } finally {
         setIsLoading(false);
@@ -108,7 +146,13 @@ export function ImageSelector({ flashcard, noteType, onSelect }: ImageSelectorPr
   useEffect(() => {
     const initialQuery = cardWord.trim();
     setSearchQuery(initialQuery);
+    setPastedImages(
+      flashcard.selectedImages.filter(
+        (image) => image.source === 'pasted' || image.url.startsWith('data:image/'),
+      ),
+    );
     setSelectedImages(flashcard.selectedImages.map((image) => image.url));
+    setPasteError(null);
     void runSearch(initialQuery);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cardWord, flashcard.id, runSearch]);
@@ -118,6 +162,7 @@ export function ImageSelector({ flashcard, noteType, onSelect }: ImageSelectorPr
       const nextSelectedImages = resolveSelectedImages(
         nextSelectedUrls,
         images,
+        pastedImages,
         flashcard.selectedImages,
       );
 
@@ -126,7 +171,7 @@ export function ImageSelector({ flashcard, noteType, onSelect }: ImageSelectorPr
         selectedImages: nextSelectedImages,
       });
     },
-    [flashcard, images, onSelect],
+    [flashcard, images, onSelect, pastedImages],
   );
 
   const handleToggleImage = useCallback(
@@ -154,6 +199,75 @@ export function ImageSelector({ flashcard, noteType, onSelect }: ImageSelectorPr
   const handleSearch = useCallback(async () => {
     await runSearch(searchQuery);
   }, [runSearch, searchQuery]);
+
+  const appendPastedFiles = useCallback(
+    async (files: File[]) => {
+      const imageFiles = files.filter((file) => file.type.startsWith('image/'));
+
+      if (imageFiles.length === 0) {
+        setPasteError('No image found. Paste or choose image files only.');
+        return;
+      }
+
+      const remainingSlots = 2 - pastedImages.length;
+      if (remainingSlots <= 0) {
+        setPasteError('You can add up to 2 of your own images per flashcard.');
+        return;
+      }
+
+      const filesToProcess = imageFiles.slice(0, remainingSlots);
+
+      try {
+        const nextImages = await Promise.all(
+          filesToProcess.map((file) => fileToFlashcardImage(file)),
+        );
+        setPastedImages((previousImages) => [...previousImages, ...nextImages]);
+        setPasteError(
+          imageFiles.length > remainingSlots ? 'Only the first 2 pasted images were added.' : null,
+        );
+      } catch (error) {
+        if (error instanceof Error) {
+          setPasteError(error.message);
+        } else {
+          setPasteError('Could not process the pasted image.');
+        }
+      }
+    },
+    [pastedImages.length],
+  );
+
+  useEffect(() => {
+    const onWindowPaste = (event: ClipboardEvent) => {
+      const files = Array.from(event.clipboardData?.files ?? []);
+      if (files.length === 0) {
+        return;
+      }
+
+      event.preventDefault();
+      void appendPastedFiles(files);
+    };
+
+    window.addEventListener('paste', onWindowPaste);
+    return () => {
+      window.removeEventListener('paste', onWindowPaste);
+    };
+  }, [appendPastedFiles]);
+
+  const allImages = useMemo(() => {
+    const mergedImages = [
+      ...pastedImages,
+      ...images.map((image) => ({
+        id: image.link,
+        url: image.link,
+        thumbnail: image.thumbnailLink || image.link,
+        title: 'Selected image',
+      })),
+    ];
+
+    return mergedImages.filter(
+      (image, index, source) => source.findIndex((item) => item.url === image.url) === index,
+    );
+  }, [images, pastedImages]);
 
   return (
     <div className="w-full space-y-6">
@@ -183,10 +297,51 @@ export function ImageSelector({ flashcard, noteType, onSelect }: ImageSelectorPr
           </Button>
         </div>
 
+        <div className="border-border/60 bg-surface-raised/50 space-y-3 rounded-lg border border-dashed p-4">
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              onClick={() => fileInputRef.current?.click()}
+            >
+              <ImagePlus className="size-4" />
+              Choose image
+            </Button>
+            <span className="text-[13px] text-muted-foreground">
+              <Clipboard className="mr-1 inline size-3.5 align-[-2px]" />
+              Paste with Ctrl/Cmd + V
+            </span>
+          </div>
+          <p className="text-[12px] text-muted-foreground">
+            Add up to 2 of your own images for this card. Works on desktop and mobile file pickers.
+          </p>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            multiple
+            className="sr-only"
+            onChange={(event) => {
+              const files = Array.from(event.target.files ?? []);
+              if (files.length > 0) {
+                void appendPastedFiles(files);
+              }
+              event.currentTarget.value = '';
+            }}
+          />
+        </div>
+
         <p className="text-[13px] text-muted-foreground">
           <span className="font-medium text-foreground">{selectedImages.length}</span> / 2 images
           selected
         </p>
+
+        {pasteError ? (
+          <div className="border-destructive/20 bg-destructive/5 rounded-md border p-4 text-[14px] text-destructive">
+            {pasteError}
+          </div>
+        ) : null}
 
         {isLoading ? (
           <div className="border-border/60 bg-surface-raised/50 flex min-h-56 items-center justify-center rounded-lg border border-dashed">
@@ -194,38 +349,39 @@ export function ImageSelector({ flashcard, noteType, onSelect }: ImageSelectorPr
           </div>
         ) : null}
 
-        {!isLoading && error ? (
+        {!isLoading && searchError ? (
           <div className="border-destructive/20 bg-destructive/5 rounded-md border p-4 text-[14px] text-destructive">
-            {error}
+            {searchError}
           </div>
         ) : null}
 
-        {!isLoading && !error && images.length === 0 ? (
+        {!isLoading && allImages.length === 0 ? (
           <div className="border-border/60 bg-surface-raised/50 rounded-lg border border-dashed p-8 text-center text-[14px] text-muted-foreground">
-            No images found. Try a different search term.
+            No images yet. Search, paste, or choose images to continue.
           </div>
         ) : null}
 
-        {!isLoading && !error && images.length > 0 ? (
+        {!isLoading && allImages.length > 0 ? (
           <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
-            {images.map((image) => {
-              const isSelected = selectedImages.includes(image.link);
+            {allImages.map((image) => {
+              const isSelected = selectedImages.includes(image.url);
               const disableNewSelection = !isSelected && selectedImages.length >= 2;
 
               return (
                 <button
-                  key={image.link}
+                  key={image.url}
                   type="button"
+                  aria-label={`Select image ${image.title}`}
                   className={`group relative aspect-video overflow-hidden rounded-lg border-2 transition-all duration-150 ${
                     isSelected
                       ? 'ring-foreground/15 border-foreground ring-2 ring-offset-2 ring-offset-background'
                       : 'border-border hover:border-border-hover hover:shadow-sm'
                   } ${disableNewSelection ? 'cursor-not-allowed opacity-40' : 'cursor-pointer'}`}
-                  onClick={() => handleToggleImage(image.link)}
+                  onClick={() => handleToggleImage(image.url)}
                   disabled={disableNewSelection}
                 >
                   <img
-                    src={image.thumbnailLink || image.link}
+                    src={image.thumbnail || image.url}
                     alt=""
                     className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-[1.03]"
                     loading="lazy"
