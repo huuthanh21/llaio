@@ -10,7 +10,7 @@ interface GenankiDeck {
 
 interface GenankiPackage {
   addDeck: (deck: GenankiDeck) => void;
-  addMedia: (data: Blob | string, filename: string) => void;
+  addMedia: (data: Blob | ArrayBuffer | string, filename: string) => void;
   writeToFile: (filename: string) => void;
 }
 
