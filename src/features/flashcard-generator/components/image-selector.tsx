@@ -203,45 +203,26 @@ export function ImageSelector({ flashcard, noteType, onSelect }: ImageSelectorPr
     await runSearch(searchQuery);
   }, [runSearch, searchQuery]);
 
-  const appendPastedFiles = useCallback(
-    async (files: File[]) => {
-      const imageFiles = files.filter((file) => file.type.startsWith('image/'));
+  const appendPastedFiles = useCallback(async (files: File[]) => {
+    setPasteError(null);
+    const imageFiles = files.filter((file) => file.type.startsWith('image/'));
 
-      if (imageFiles.length === 0) {
-        setPasteError('No image found. Paste or choose image files only.');
-        return;
+    if (imageFiles.length === 0) {
+      setPasteError('No image found. Paste or choose image files only.');
+      return;
+    }
+
+    try {
+      const nextImages = await Promise.all(imageFiles.map((file) => fileToFlashcardImage(file)));
+      setPastedImages((previousImages) => [...previousImages, ...nextImages]);
+    } catch (error) {
+      if (error instanceof Error) {
+        setPasteError(error.message);
+      } else {
+        setPasteError('Could not process the pasted image.');
       }
-
-      const remainingSlots = MAX_CUSTOM_IMAGES - pastedImages.length;
-      if (remainingSlots <= 0) {
-        setPasteError(
-          `You have reached the limit of ${MAX_CUSTOM_IMAGES} of your own images per flashcard.`,
-        );
-        return;
-      }
-
-      const filesToProcess = imageFiles.slice(0, remainingSlots);
-
-      try {
-        const nextImages = await Promise.all(
-          filesToProcess.map((file) => fileToFlashcardImage(file)),
-        );
-        setPastedImages((previousImages) => [...previousImages, ...nextImages]);
-        setPasteError(
-          imageFiles.length > remainingSlots
-            ? `Only the first ${remainingSlots} pasted image${remainingSlots > 1 ? 's were' : ' was'} added.`
-            : null,
-        );
-      } catch (error) {
-        if (error instanceof Error) {
-          setPasteError(error.message);
-        } else {
-          setPasteError('Could not process the pasted image.');
-        }
-      }
-    },
-    [pastedImages.length],
-  );
+    }
+  }, []);
 
   useEffect(() => {
     const onWindowPaste = (event: ClipboardEvent) => {
@@ -270,15 +251,7 @@ export function ImageSelector({ flashcard, noteType, onSelect }: ImageSelectorPr
   }, [appendPastedFiles]);
 
   const allImages = useMemo(() => {
-    const mergedImages = [
-      ...pastedImages,
-      ...images.map((image) => ({
-        id: image.link,
-        url: image.link,
-        thumbnail: image.thumbnailLink || image.link,
-        title: 'Selected image',
-      })),
-    ];
+    const mergedImages = [...pastedImages, ...images.map((image) => toFlashcardImage(image))];
     const seenUrls = new Set<string>();
 
     return mergedImages.filter((image) => {
@@ -334,9 +307,8 @@ export function ImageSelector({ flashcard, noteType, onSelect }: ImageSelectorPr
               Paste with Ctrl/Cmd + V
             </span>
           </div>
-          <p className="text-[12px] text-muted-foreground">
-            Add up to {MAX_CUSTOM_IMAGES} of your own images for this card. Works on desktop and
-            mobile file pickers.
+          <p className="text-[13px] text-muted-foreground">
+            Paste or choose your own images. Select up to {MAX_CUSTOM_IMAGES} for this card.
           </p>
           <input
             ref={fileInputRef}

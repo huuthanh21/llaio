@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 
 import type { Flashcard } from '@/models/flashcard';
 import { ENGLISH_PICTURE_WORDS } from '@/models/flashcard';
@@ -89,7 +89,9 @@ describe('ImageSelector', () => {
       value: { files: [imageFile] },
     });
 
-    window.dispatchEvent(pasteEvent);
+    act(() => {
+      window.dispatchEvent(pasteEvent);
+    });
 
     await waitFor(() =>
       expect(screen.getAllByRole('button', { name: /select image/i })).toHaveLength(1),
@@ -102,7 +104,45 @@ describe('ImageSelector', () => {
     expect(selectedFlashcard.selectedImages[0]?.source).toBe('pasted');
   });
 
-  it('limits own images to 2 when choosing files', async () => {
+  it('allows choosing more than 2 files while keeping selection capped at 2', async () => {
+    const onSelect = vi.fn();
+    render(
+      <ImageSelector
+        flashcard={makeFlashcard()}
+        noteType={ENGLISH_PICTURE_WORDS}
+        onSelect={onSelect}
+      />,
+    );
+
+    const fileInput = document.querySelector('input[type="file"]');
+    expect(fileInput).toBeTruthy();
+
+    fireEvent.change(fileInput as HTMLInputElement, {
+      target: {
+        files: [
+          new File(['image-1'], 'first.png', { type: 'image/png' }),
+          new File(['image-2'], 'second.png', { type: 'image/png' }),
+          new File(['image-3'], 'third.png', { type: 'image/png' }),
+        ],
+      },
+    });
+
+    await waitFor(() =>
+      expect(screen.getAllByRole('button', { name: /select image/i })).toHaveLength(3),
+    );
+
+    const imageButtons = screen.getAllByRole('button', { name: /select image/i });
+    fireEvent.click(imageButtons[0] as HTMLButtonElement);
+    fireEvent.click(imageButtons[1] as HTMLButtonElement);
+
+    expect(
+      screen.getByText((_, element) => element?.textContent === '2 / 2 images selected'),
+    ).toBeInTheDocument();
+    expect(imageButtons[2]).toBeDisabled();
+    expect(onSelect).toHaveBeenCalledTimes(2);
+  });
+
+  it('allows adding more pasted images even when 2 are already selected', async () => {
     render(
       <ImageSelector
         flashcard={makeFlashcard()}
@@ -124,10 +164,26 @@ describe('ImageSelector', () => {
       },
     });
 
-    await waitFor(() => {
-      expect(screen.getByText(/only the first 2 pasted images were added/i)).toBeInTheDocument();
+    await waitFor(() =>
+      expect(screen.getAllByRole('button', { name: /select image/i })).toHaveLength(3),
+    );
+
+    let imageButtons = screen.getAllByRole('button', { name: /select image/i });
+    fireEvent.click(imageButtons[0] as HTMLButtonElement);
+    fireEvent.click(imageButtons[1] as HTMLButtonElement);
+
+    fireEvent.change(fileInput as HTMLInputElement, {
+      target: {
+        files: [new File(['image-4'], 'fourth.png', { type: 'image/png' })],
+      },
     });
 
-    expect(screen.getAllByRole('button', { name: /select image/i })).toHaveLength(2);
+    await waitFor(() =>
+      expect(screen.getAllByRole('button', { name: /select image/i })).toHaveLength(4),
+    );
+
+    expect(screen.queryByText(/reached the limit/i)).not.toBeInTheDocument();
+    imageButtons = screen.getAllByRole('button', { name: /select image/i });
+    expect(imageButtons[3]).toBeDisabled();
   });
 });
