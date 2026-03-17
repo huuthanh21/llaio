@@ -24,8 +24,9 @@ vi.mock('@/stores', () => ({
   GOOGLE_CSE_ID: 'test-cse-id',
 }));
 
+const exportFlashcardsMock = vi.fn();
 vi.mock('@/services/anki-export-service', () => ({
-  exportFlashcards: vi.fn().mockResolvedValue(undefined),
+  exportFlashcards: (...args: unknown[]) => exportFlashcardsMock(...args),
 }));
 
 function makeFlashcard(word = 'apple'): Flashcard {
@@ -108,5 +109,29 @@ describe('FlashcardGrid', () => {
     render(<FlashcardGrid flashcards={[]} noteType={noteType} onEdit={onEdit} onBack={onBack} />);
 
     expect(screen.queryAllByRole('button', { name: /edit flashcard for/i })).toHaveLength(0);
+  });
+
+  it('shows error message when export fails', async () => {
+    const error = new Error('Export failed');
+    exportFlashcardsMock.mockRejectedValueOnce(error);
+
+    render(
+      <FlashcardGrid
+        flashcards={[makeFlashcard()]}
+        noteType={noteType}
+        onEdit={onEdit}
+        onBack={onBack}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: /export/i }));
+
+    const deckNameInput = screen.getByLabelText(/deck name/i);
+    fireEvent.change(deckNameInput, { target: { value: 'Test Deck' } });
+
+    fireEvent.click(screen.getByRole('button', { name: /export/i }));
+
+    const errorBanner = await screen.findByText(/export failed/i);
+    expect(errorBanner).toBeInTheDocument();
   });
 });
