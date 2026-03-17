@@ -11,6 +11,11 @@
       "sourceType": "github",
       "computedHash": "d9678700cc105ae1af98763fb4f85168ba398395d241aae336ef421836d9dd82"
     },
+    "architecture-designer": {
+      "source": "jeffallan/claude-skills",
+      "sourceType": "github",
+      "computedHash": "6ee492443a9f78f232d744498d70faffe26ce268ec2b8657953dfc69f33fcd4e"
+    },
     "audit": {
       "source": "pbakaus/impeccable",
       "sourceType": "github",
@@ -30,6 +35,11 @@
       "source": "pbakaus/impeccable",
       "sourceType": "github",
       "computedHash": "c6ad8d7ae05771fee9232b72a16a42180e0e111c7372795f9009bf1cc52ccb95"
+    },
+    "create-specification": {
+      "source": "github/awesome-copilot",
+      "sourceType": "github",
+      "computedHash": "45b9ef98b0fb82ba0e1aee65dfb464fa1f8494a14a557b9788d73aae87e9e618"
     },
     "critique": {
       "source": "pbakaus/impeccable",
