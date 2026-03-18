@@ -7,7 +7,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { Textarea } from '@/components/ui/textarea';
 import type { Flashcard } from '@/models/flashcard';
 import { ENGLISH_PICTURE_WORDS } from '@/models/flashcard';
-import { generateFlashcards } from '@/services/gemini-service';
+import { generateFlashcardsFromWords } from '@/services/flashcard-generation-service';
 import { useLanguageStore, useSettingsStore } from '@/stores';
 
 export interface WordInputProps {
@@ -50,20 +50,13 @@ export function WordInput({ onGenerate }: WordInputProps) {
     setError(null);
 
     try {
-      const apiResults = await generateFlashcards(
+      const newFlashcards = await generateFlashcardsFromWords({
         words,
         apiKey,
-        ENGLISH_PICTURE_WORDS,
+        noteType: ENGLISH_PICTURE_WORDS,
         targetLanguage,
         nativeLanguage,
-      );
-
-      const newFlashcards: Flashcard[] = apiResults.map((fieldValues) => ({
-        id: crypto.randomUUID(),
-        noteTypeId: ENGLISH_PICTURE_WORDS.id,
-        fieldValues,
-        selectedImages: [],
-      }));
+      });
 
       onGenerate(newFlashcards);
     } catch (err) {

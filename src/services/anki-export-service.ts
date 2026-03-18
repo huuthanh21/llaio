@@ -25,6 +25,91 @@ function buildRequirements(noteType: NoteType): [number, 'all' | 'any', number[]
   return noteType.cardTemplates.map((_, i) => [i, 'all', [fieldIndex]]);
 }
 
+export interface FlashcardExportFailure {
+  flashcardId: string;
+  word: string;
+  reason: string;
+}
+
+export interface FlashcardExportSuccessResult {
+  ok: true;
+  exportedCount: number;
+}
+
+export interface FlashcardExportErrorResult {
+  ok: false;
+  message: string;
+  failedCount: number;
+  failedWords: string[];
+  failures: FlashcardExportFailure[];
+}
+
+export type FlashcardExportResult = FlashcardExportSuccessResult | FlashcardExportErrorResult;
+
+function getPrimaryWord(flashcard: Flashcard, noteType: NoteType): string {
+  const titleField = noteType.fields.find((field) => field.isTitle) ?? noteType.fields[0];
+  if (!titleField) {
+    return 'Untitled';
+  }
+
+  const value = flashcard.fieldValues[titleField.name];
+  if (typeof value === 'string' && value.trim().length > 0) {
+    return value.trim();
+  }
+
+  return 'Untitled';
+}
+
+function buildFailure(
+  flashcard: Flashcard,
+  noteType: NoteType,
+  reason: string,
+): FlashcardExportFailure {
+  return {
+    flashcardId: flashcard.id,
+    word: getPrimaryWord(flashcard, noteType),
+    reason,
+  };
+}
+
+function buildErrorResult(
+  message: string,
+  failures: FlashcardExportFailure[],
+): FlashcardExportErrorResult {
+  const failedWords = [...new Set(failures.map((failure) => failure.word))];
+  return {
+    ok: false,
+    message,
+    failedCount: failures.length,
+    failedWords,
+    failures,
+  };
+}
+
+function preValidateFlashcards(
+  flashcards: Flashcard[],
+  noteType: NoteType,
+): FlashcardExportFailure[] {
+  const failures: FlashcardExportFailure[] = [];
+
+  for (const flashcard of flashcards) {
+    for (const field of noteType.fields) {
+      if (!field.required) {
+        continue;
+      }
+
+      const value = flashcard.fieldValues[field.name] ?? '';
+      if (value.trim().length === 0) {
+        failures.push(
+          buildFailure(flashcard, noteType, `Required field "${field.name}" is missing.`),
+        );
+      }
+    }
+  }
+
+  return failures;
+}
+
 async function fetchImageBuffer(imageUrl: string): Promise<ArrayBuffer | null> {
   const proxyUrl = PROXY_BASE_URL + encodeURIComponent(imageUrl);
   try {
@@ -50,7 +135,19 @@ export async function exportFlashcards(
   flashcards: Flashcard[],
   noteType: NoteType,
   deckName: string,
-): Promise<void> {
+): Promise<FlashcardExportResult> {
+  if (flashcards.length === 0) {
+    return buildErrorResult('No flashcards available for export.', []);
+  }
+
+  const validationFailures = preValidateFlashcards(flashcards, noteType);
+  if (validationFailures.length > 0) {
+    return buildErrorResult(
+      'Export failed. Fix required fields and try again.',
+      validationFailures,
+    );
+  }
+
   const model = createModel({
     name: noteType.name,
     id: noteType.id,
@@ -70,37 +167,47 @@ export async function exportFlashcards(
 
   const imageField = noteType.fields.find((f) => f.fieldType === 'image');
 
-  for (const flashcard of flashcards) {
-    const fieldValues: string[] = [];
-    const imageFilenames: string[] = [];
+  try {
+    for (const flashcard of flashcards) {
+      const fieldValues: string[] = [];
+      const imageFilenames: string[] = [];
 
-    for (const field of noteType.fields) {
-      if (imageField && field.name === imageField.name && flashcard.selectedImages.length > 0) {
-        const imgTags = flashcard.selectedImages.map((image, idx) => {
-          const filename = `${flashcard.id}_${idx}_${sanitizeFilename(image.title)}.jpg`;
-          imageFilenames.push(filename);
-          return `<img src="${filename}">`;
-        });
-        fieldValues.push(imgTags.join(' '));
-      } else {
-        fieldValues.push(flashcard.fieldValues[field.name] ?? '');
+      for (const field of noteType.fields) {
+        if (imageField && field.name === imageField.name && flashcard.selectedImages.length > 0) {
+          const imgTags = flashcard.selectedImages.map((image, idx) => {
+            const filename = `${flashcard.id}_${idx}_${sanitizeFilename(image.title)}.jpg`;
+            imageFilenames.push(filename);
+            return `<img src="${filename}">`;
+          });
+          fieldValues.push(imgTags.join(' '));
+        } else {
+          fieldValues.push(flashcard.fieldValues[field.name] ?? '');
+        }
       }
-    }
 
-    deck.addNote(createNote(model, fieldValues));
+      deck.addNote(createNote(model, fieldValues));
 
-    for (let i = 0; i < flashcard.selectedImages.length; i++) {
-      const image = flashcard.selectedImages[i];
-      const filename = imageFilenames[i];
-      if (filename) {
-        const buffer = await fetchImageBuffer(image.url);
-        if (buffer) {
-          pkg.addMedia(buffer, filename);
+      for (let i = 0; i < flashcard.selectedImages.length; i++) {
+        const image = flashcard.selectedImages[i];
+        const filename = imageFilenames[i];
+        if (filename) {
+          const buffer = await fetchImageBuffer(image.url);
+          if (buffer) {
+            pkg.addMedia(buffer, filename);
+          }
         }
       }
     }
-  }
 
-  pkg.addDeck(deck);
-  pkg.writeToFile(`${deckName}.apkg`);
+    pkg.addDeck(deck);
+    pkg.writeToFile(`${deckName}.apkg`);
+    return {
+      ok: true,
+      exportedCount: flashcards.length,
+    };
+  } catch (error) {
+    const reason = error instanceof Error ? error.message : 'Unexpected export error.';
+    const failures = flashcards.map((flashcard) => buildFailure(flashcard, noteType, reason));
+    return buildErrorResult('Export failed. No flashcards were exported.', failures);
+  }
 }

@@ -86,6 +86,11 @@ describe('Sidebar', () => {
     expect(screen.getByText('Flashcard Generator')).toBeTruthy();
   });
 
+  it('renders the Saved Words nav item', () => {
+    render(<Sidebar onClose={onClose} />);
+    expect(screen.getByText('Saved Words')).toBeTruthy();
+  });
+
   it('renders the Settings button', () => {
     render(<Sidebar onClose={onClose} />);
     expect(screen.getByText('Settings')).toBeTruthy();
@@ -101,6 +106,12 @@ describe('Sidebar', () => {
     render(<Sidebar onClose={onClose} />);
     const link = screen.getByText('Flashcard Generator').closest('a');
     expect(link?.getAttribute('href')).toBe('/flashcard-generator');
+  });
+
+  it('Saved Words link points to /saved-words', () => {
+    render(<Sidebar onClose={onClose} />);
+    const link = screen.getByText('Saved Words').closest('a');
+    expect(link?.getAttribute('href')).toBe('/saved-words');
   });
 
   it('calls openModal when Settings button is clicked', () => {
@@ -119,7 +130,7 @@ describe('Sidebar', () => {
   it('renders two nav items', () => {
     render(<Sidebar onClose={onClose} />);
     const listItems = screen.getAllByRole('listitem');
-    expect(listItems.length).toBe(2);
+    expect(listItems.length).toBe(3);
   });
 
   it('renders a nav element as container', () => {
