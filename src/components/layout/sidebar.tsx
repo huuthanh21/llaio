@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router';
-import { Search, Sparkles, Settings } from 'lucide-react';
+import { Search, Sparkles, Bookmark, Settings } from 'lucide-react';
 import { useSettingsStore } from '@/stores';
 
 interface SidebarProps {
@@ -12,6 +12,11 @@ const navItems = [
     label: 'Flashcard Generator',
     route: '/flashcard-generator',
     icon: Sparkles,
+  },
+  {
+    label: 'Saved Words',
+    route: '/saved-words',
+    icon: Bookmark,
   },
 ];
 

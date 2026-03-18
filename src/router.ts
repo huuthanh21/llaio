@@ -2,6 +2,7 @@ import { createRouter, createRoute, createRootRoute, redirect } from '@tanstack/
 import { RootComponent } from './routes/__root';
 import { LookupComponent } from './routes/lookup';
 import { FlashcardGeneratorComponent } from './routes/flashcard-generator';
+import { SavedWordsComponent } from './routes/saved-words';
 
 const rootRoute = createRootRoute({ component: RootComponent });
 
@@ -25,6 +26,12 @@ const flashcardRoute = createRoute({
   component: FlashcardGeneratorComponent,
 });
 
+const savedWordsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/saved-words',
+  component: SavedWordsComponent,
+});
+
 const notFoundRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '*',
@@ -33,7 +40,13 @@ const notFoundRoute = createRoute({
   },
 });
 
-const routeTree = rootRoute.addChildren([indexRoute, lookupRoute, flashcardRoute, notFoundRoute]);
+const routeTree = rootRoute.addChildren([
+  indexRoute,
+  lookupRoute,
+  flashcardRoute,
+  savedWordsRoute,
+  notFoundRoute,
+]);
 
 export const router = createRouter({ routeTree });
 

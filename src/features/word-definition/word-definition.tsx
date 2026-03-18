@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { marked } from 'marked';
-import { RotateCcw } from 'lucide-react';
+import { Bookmark, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -18,6 +18,12 @@ import {
   getHistory,
   type HistoryEntry,
 } from '@/services/word-history-service';
+import {
+  isWordSaved,
+  removeWord,
+  saveWord,
+  subscribeSavedWordsChanges,
+} from '@/services/saved-words-service';
 import { useLanguageStore, useSettingsStore } from '@/stores';
 import { ContentStatus } from './content-status';
 
@@ -34,6 +40,8 @@ export function WordDefinition() {
   const [status, setStatus] = useState<DefinitionStatus>('idle');
   const [error, setError] = useState<string | null>(null);
   const [history, setHistory] = useState<HistoryEntry[]>([]);
+  const [isSaved, setIsSaved] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   const abortControllerRef = useRef<AbortController | null>(null);
 
@@ -56,6 +64,28 @@ export function WordDefinition() {
   useEffect(() => {
     loadHistory();
   }, [loadHistory]);
+
+  useEffect(() => {
+    const trimmedWord = word.trim();
+    if (!trimmedWord) {
+      setIsSaved(false);
+      return;
+    }
+
+    setIsSaved(isWordSaved(trimmedWord, targetLanguage));
+  }, [targetLanguage, word]);
+
+  useEffect(
+    () =>
+      subscribeSavedWordsChanges(() => {
+        const trimmedWord = word.trim();
+        if (!trimmedWord) {
+          return;
+        }
+        setIsSaved(isWordSaved(trimmedWord, targetLanguage));
+      }),
+    [targetLanguage, word],
+  );
 
   useEffect(() => {
     return () => {
@@ -132,7 +162,29 @@ export function WordDefinition() {
     setWord('');
     setDefinition('');
     setError(null);
+    setSaveError(null);
     setStatus('idle');
+  };
+
+  const canSaveWord = status === 'success' && word.trim().length > 0;
+
+  const handleToggleSavedWord = () => {
+    if (!canSaveWord) {
+      return;
+    }
+
+    const trimmedWord = word.trim();
+    const result = isSaved
+      ? removeWord(trimmedWord, targetLanguage)
+      : saveWord(trimmedWord, targetLanguage);
+
+    if (!result.ok) {
+      setSaveError(result.error ?? 'Failed to update saved words.');
+      return;
+    }
+
+    setSaveError(null);
+    setIsSaved(!isSaved);
   };
 
   const handleSelectHistory = (selectedWord: string) => {
@@ -186,8 +238,24 @@ export function WordDefinition() {
             >
               <RotateCcw className="h-4 w-4" />
             </Button>
+
+            <Button
+              variant={isSaved ? 'secondary' : 'outline'}
+              onClick={handleToggleSavedWord}
+              disabled={!canSaveWord}
+              className="h-11 px-3"
+            >
+              <Bookmark className="h-4 w-4" />
+              {isSaved ? 'Saved' : 'Save word'}
+            </Button>
           </div>
         </div>
+
+        {saveError ? (
+          <div className="border-destructive/20 bg-destructive/5 rounded-md border px-3 py-2.5 text-[14px] text-destructive">
+            {saveError}
+          </div>
+        ) : null}
 
         {historyWords.length > 0 && (
           <Select onValueChange={handleSelectHistory}>

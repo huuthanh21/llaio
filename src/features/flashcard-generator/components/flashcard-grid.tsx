@@ -1,7 +1,17 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import type { Flashcard, NoteType } from '@/models/flashcard';
+import type { Language } from '@/stores/language-store';
+import { removeSavedWordsByIds } from '@/services/saved-words-service';
 
 import { ExportFlashcardsModal } from './export-flashcards-modal';
 import { FlashcardEditor } from './flashcard-editor';
@@ -10,14 +20,31 @@ import { FlashcardPreview } from './flashcard-preview';
 interface FlashcardGridProps {
   flashcards: Flashcard[];
   noteType: NoteType;
+  generationSource?: 'manual' | 'saved-words';
+  savedWordIds?: string[];
+  savedWordsLanguage?: Language | null;
+  onSavedWordIdsChange?: (ids: string[]) => void;
   onEdit: (flashcard: Flashcard) => void;
   onBack: () => void;
 }
 
-export function FlashcardGrid({ flashcards, noteType, onEdit, onBack }: FlashcardGridProps) {
+export function FlashcardGrid({
+  flashcards,
+  noteType,
+  generationSource = 'manual',
+  savedWordIds = [],
+  savedWordsLanguage = null,
+  onSavedWordIdsChange,
+  onEdit,
+  onBack,
+}: FlashcardGridProps) {
   const [localFlashcards, setLocalFlashcards] = useState<Flashcard[]>(flashcards);
   const [editingFlashcardId, setEditingFlashcardId] = useState<string | null>(null);
   const [exportModalOpen, setExportModalOpen] = useState(false);
+  const [showCleanupDialog, setShowCleanupDialog] = useState(false);
+  const [isCleaningUp, setIsCleaningUp] = useState(false);
+  const [cleanupError, setCleanupError] = useState<string | null>(null);
+  const [lastExportedCount, setLastExportedCount] = useState(0);
 
   useEffect(() => {
     setLocalFlashcards(flashcards);
@@ -42,6 +69,47 @@ export function FlashcardGrid({ flashcards, noteType, onEdit, onBack }: Flashcar
     );
     onEdit(updated);
     setEditingFlashcardId(null);
+  };
+
+  const canShowSavedWordsCleanup =
+    generationSource === 'saved-words' && savedWordIds.length > 0 && Boolean(savedWordsLanguage);
+
+  const handleExportSuccess = (exportedCount: number) => {
+    setCleanupError(null);
+    setLastExportedCount(exportedCount);
+    if (canShowSavedWordsCleanup) {
+      setShowCleanupDialog(true);
+      return;
+    }
+    onBack();
+  };
+
+  const handleKeepSavedWords = () => {
+    setShowCleanupDialog(false);
+    onBack();
+  };
+
+  const handleRemoveSavedWords = () => {
+    if (!savedWordsLanguage || savedWordIds.length === 0) {
+      setShowCleanupDialog(false);
+      onBack();
+      return;
+    }
+
+    setIsCleaningUp(true);
+    setCleanupError(null);
+
+    const result = removeSavedWordsByIds(savedWordIds, savedWordsLanguage);
+    if (!result.ok) {
+      setCleanupError(result.error ?? 'Failed to remove exported saved words.');
+      setIsCleaningUp(false);
+      return;
+    }
+
+    onSavedWordIdsChange?.([]);
+    setIsCleaningUp(false);
+    setShowCleanupDialog(false);
+    onBack();
   };
 
   return (
@@ -94,8 +162,46 @@ export function FlashcardGrid({ flashcards, noteType, onEdit, onBack }: Flashcar
         open={exportModalOpen}
         flashcards={localFlashcards}
         noteType={noteType}
+        onExportSuccess={handleExportSuccess}
         onClose={() => setExportModalOpen(false)}
       />
+
+      <Dialog open={showCleanupDialog} onOpenChange={setShowCleanupDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Export complete</DialogTitle>
+            <DialogDescription>
+              {lastExportedCount} {lastExportedCount === 1 ? 'flashcard was' : 'flashcards were'}{' '}
+              exported. Remove the exported words from Saved Words?
+            </DialogDescription>
+          </DialogHeader>
+
+          {cleanupError ? (
+            <div className="border-destructive/20 bg-destructive/5 rounded-md border px-3 py-2.5 text-[14px] text-destructive">
+              {cleanupError}
+            </div>
+          ) : null}
+
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleKeepSavedWords}
+              disabled={isCleaningUp}
+            >
+              Keep saved words
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={handleRemoveSavedWords}
+              disabled={isCleaningUp}
+            >
+              {isCleaningUp ? 'Removing…' : 'Remove exported words'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </section>
   );
 }

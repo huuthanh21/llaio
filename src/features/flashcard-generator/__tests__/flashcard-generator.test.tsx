@@ -29,7 +29,7 @@ vi.mock('@/services/gemini-service', () => ({
 }));
 
 vi.mock('@/services/anki-export-service', () => ({
-  exportFlashcards: vi.fn().mockResolvedValue(undefined),
+  exportFlashcards: vi.fn().mockResolvedValue({ ok: true, exportedCount: 0 }),
 }));
 
 vi.mock('../components/image-selection-flow', () => ({

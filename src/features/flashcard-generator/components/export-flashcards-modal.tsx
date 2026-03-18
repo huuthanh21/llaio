@@ -18,6 +18,7 @@ interface ExportFlashcardsModalProps {
   open: boolean;
   flashcards: Flashcard[];
   noteType: NoteType;
+  onExportSuccess?: (exportedCount: number) => void;
   onClose: () => void;
 }
 
@@ -25,32 +26,39 @@ export function ExportFlashcardsModal({
   open,
   flashcards,
   noteType,
+  onExportSuccess,
   onClose,
 }: ExportFlashcardsModalProps) {
   const [deckName, setDeckName] = useState('LLAIO Flashcards');
   const [isExporting, setIsExporting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [failedWords, setFailedWords] = useState<string[]>([]);
 
   const handleExport = async () => {
     const normalizedDeckName = deckName.trim();
 
     if (!normalizedDeckName) {
       setErrorMessage('Deck name is required.');
-      setSuccessMessage(null);
+      setFailedWords([]);
       return;
     }
 
     setIsExporting(true);
     setErrorMessage(null);
-    setSuccessMessage(null);
+    setFailedWords([]);
 
     try {
-      await exportFlashcards(flashcards, noteType, normalizedDeckName);
-      setSuccessMessage(`Exported ${flashcards.length} flashcards successfully.`);
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Failed to export flashcards.';
-      setErrorMessage(message);
+      const result = await exportFlashcards(flashcards, noteType, normalizedDeckName);
+      if (result.ok) {
+        onExportSuccess?.(result.exportedCount);
+        handleClose();
+      } else {
+        setErrorMessage(result.message);
+        setFailedWords(result.failedWords);
+      }
+    } catch {
+      setErrorMessage('Failed to export flashcards.');
+      setFailedWords([]);
     } finally {
       setIsExporting(false);
     }
@@ -62,7 +70,7 @@ export function ExportFlashcardsModal({
     }
 
     setErrorMessage(null);
-    setSuccessMessage(null);
+    setFailedWords([]);
     onClose();
   };
 
@@ -92,12 +100,22 @@ export function ExportFlashcardsModal({
 
           {errorMessage ? (
             <div className="border-destructive/20 bg-destructive/5 rounded-md border px-3 py-2.5 text-[14px] text-destructive">
-              {errorMessage}
-            </div>
-          ) : null}
-          {successMessage ? (
-            <div className="border-success/20 bg-success/5 rounded-md border px-3 py-2.5 text-[14px] text-success">
-              {successMessage}
+              <p>{errorMessage}</p>
+              {failedWords.length > 0 ? (
+                <div className="mt-2 space-y-1">
+                  <p className="text-[13px] font-medium text-destructive">
+                    {failedWords.length} {failedWords.length === 1 ? 'word failed' : 'words failed'}
+                    :
+                  </p>
+                  <ul className="m-0 max-h-24 list-disc space-y-0.5 overflow-y-auto pl-5">
+                    {failedWords.map((word) => (
+                      <li key={word} className="text-[13px]">
+                        {word}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
             </div>
           ) : null}
         </div>

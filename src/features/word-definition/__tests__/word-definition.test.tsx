@@ -12,6 +12,13 @@ vi.mock('@/services/word-history-service', () => ({
   getCachedResponse: vi.fn(() => null),
 }));
 
+vi.mock('@/services/saved-words-service', () => ({
+  isWordSaved: vi.fn(() => false),
+  saveWord: vi.fn(() => ({ ok: true })),
+  removeWord: vi.fn(() => ({ ok: true, removed: true })),
+  subscribeSavedWordsChanges: vi.fn(() => () => undefined),
+}));
+
 vi.mock('@/stores', () => ({
   useSettingsStore: () => ({
     apiKey: 'test-api-key',
@@ -56,6 +63,11 @@ describe('WordDefinition', () => {
   it('renders the Define button', () => {
     render(<WordDefinition />);
     expect(screen.getByText('Define')).toBeTruthy();
+  });
+
+  it('renders the Save word button', () => {
+    render(<WordDefinition />);
+    expect(screen.getByRole('button', { name: /save word/i })).toBeTruthy();
   });
 
   it('renders the Reset button', () => {
