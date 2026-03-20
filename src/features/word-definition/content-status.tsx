@@ -28,7 +28,7 @@ export function ContentStatus({ status, error, children, hasContent = false }: C
 
   if (status === 'error') {
     return (
-      <div className="border-destructive/20 bg-destructive/5 flex min-h-48 flex-col items-center justify-center gap-3 rounded-lg border px-6 py-12">
+      <div className="border-destructive/20 bg-destructive/5 flex min-h-56 animate-fade-in flex-col items-center justify-center gap-3 rounded-lg border px-6 py-12">
         <p className="text-[14px] text-destructive">
           {error ?? 'Failed to fetch definition. Please try again.'}
         </p>
@@ -38,9 +38,9 @@ export function ContentStatus({ status, error, children, hasContent = false }: C
 
   if (status === 'loading' && !hasContent) {
     return (
-      <div className="border-border/60 bg-surface-raised/50 flex min-h-48 flex-col items-center justify-center gap-3 rounded-lg border px-6 py-12 text-muted-foreground">
+      <div className="border-border/60 bg-surface-raised/50 flex min-h-56 animate-fade-in flex-col items-center justify-center gap-3 rounded-lg border px-6 py-12 text-muted-foreground">
         <Spinner size="md" />
-        <p className="text-[13px]">Generating definition…</p>
+        <p className="animate-pulse text-[13px]">Generating definition…</p>
       </div>
     );
   }
