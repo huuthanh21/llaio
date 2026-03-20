@@ -3,6 +3,7 @@ import { marked } from 'marked';
 import { Bookmark, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { cn } from '@/lib/utils';
 import {
   Select,
   SelectContent,
@@ -224,52 +225,78 @@ export function WordDefinition() {
                 void handleDefine();
               }}
               disabled={status === 'loading' || !word.trim()}
-              className="h-11 flex-1 sm:flex-initial sm:px-6"
+              className="relative h-11 flex-1 overflow-hidden transition-all sm:flex-initial sm:px-6"
             >
-              {status === 'loading' ? <Spinner size="sm" variant="contrast" /> : 'Define'}
+              <span
+                className={cn(
+                  'transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]',
+                  status === 'loading' ? 'scale-95 opacity-0' : 'scale-100 opacity-100',
+                )}
+              >
+                Define
+              </span>
+              {status === 'loading' && (
+                <div className="absolute inset-0 flex animate-fade-in items-center justify-center">
+                  <Spinner size="sm" className="text-current" />
+                </div>
+              )}
             </Button>
 
             <Button
               variant="ghost"
               size="icon"
               onClick={handleReset}
-              className="h-11 w-11 shrink-0"
+              disabled={!word && !definition && status === 'idle'}
+              className="h-11 w-11 shrink-0 transition-colors"
               aria-label="Reset"
             >
-              <RotateCcw className="h-4 w-4" />
+              <RotateCcw className="h-4 w-4 transition-transform active:-rotate-45" />
             </Button>
 
             <Button
               variant={isSaved ? 'secondary' : 'outline'}
               onClick={handleToggleSavedWord}
               disabled={!canSaveWord}
-              className="h-11 px-3"
+              className="relative h-11 px-3 transition-colors"
             >
-              <Bookmark className="h-4 w-4" />
-              {isSaved ? 'Saved' : 'Save word'}
+              <span className="invisible flex items-center gap-2">
+                <Bookmark className="h-4 w-4" />
+                Save word
+              </span>
+              <div className="absolute inset-0 flex items-center justify-center gap-2">
+                <Bookmark
+                  className={cn(
+                    'h-4 w-4 transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]',
+                    isSaved ? 'fill-current text-foreground' : 'fill-transparent',
+                  )}
+                />
+                <span className="animate-fade-in">{isSaved ? 'Saved' : 'Save word'}</span>
+              </div>
             </Button>
           </div>
         </div>
 
         {saveError ? (
-          <div className="border-destructive/20 bg-destructive/5 rounded-md border px-3 py-2.5 text-[14px] text-destructive">
+          <div className="border-destructive/20 bg-destructive/5 animate-fade-in rounded-md border px-3 py-2.5 text-[14px] text-destructive">
             {saveError}
           </div>
         ) : null}
 
         {historyWords.length > 0 && (
-          <Select onValueChange={handleSelectHistory}>
-            <SelectTrigger className="h-9 w-full text-[13px] sm:w-64">
-              <SelectValue placeholder="Recent words" />
-            </SelectTrigger>
-            <SelectContent>
-              {historyWords.map((historyWord) => (
-                <SelectItem key={historyWord} value={historyWord}>
-                  {historyWord}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <div className="flex animate-fade-in">
+            <Select onValueChange={handleSelectHistory}>
+              <SelectTrigger className="h-9 w-full text-[13px] sm:w-64">
+                <SelectValue placeholder="Recent words" />
+              </SelectTrigger>
+              <SelectContent>
+                {historyWords.map((historyWord) => (
+                  <SelectItem key={historyWord} value={historyWord}>
+                    {historyWord}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         )}
       </div>
 

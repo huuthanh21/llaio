@@ -89,15 +89,27 @@ export function SavedWordsPage() {
       </header>
 
       <div className="sticky top-0 z-10 -mx-1 flex flex-wrap items-center gap-2 rounded-md bg-background-secondary px-1 py-1">
-        <Button type="button" variant="outline" onClick={handleToggleSelectAll}>
-          {allSelected ? 'Clear selection' : 'Select all'}
+        <Button
+          type="button"
+          variant="outline"
+          onClick={handleToggleSelectAll}
+          className="relative overflow-hidden transition-colors"
+        >
+          <span className="invisible">Clear selection</span>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span className="animate-in fade-in zoom-in-95 duration-200">
+              {allSelected ? 'Clear selection' : 'Select all'}
+            </span>
+          </div>
         </Button>
         <Button
           type="button"
           onClick={handleCreateFlashcards}
           disabled={selectedIds.length === 0 || isNavigatingToGenerator}
         >
-          Create flashcards ({selectedIds.length})
+          <span>
+            Create flashcards <span className="tabular-nums">({selectedIds.length})</span>
+          </span>
         </Button>
       </div>
 
