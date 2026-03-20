@@ -31,6 +31,17 @@ function makeFlashcard(word = 'apple'): Flashcard {
   };
 }
 
+function makeSearchResults(count: number, start = 1) {
+  return Array.from({ length: count }, (_, index) => {
+    const id = start + index;
+
+    return {
+      link: `https://images.example/${id}.jpg`,
+      thumbnailLink: `https://images.example/${id}-thumb.jpg`,
+    };
+  });
+}
+
 describe('ImageSelector', () => {
   const originalFileReader = globalThis.FileReader;
 
@@ -185,5 +196,276 @@ describe('ImageSelector', () => {
     expect(screen.queryByText(/reached the limit/i)).not.toBeInTheDocument();
     imageButtons = screen.getAllByRole('button', { name: /select image/i });
     expect(imageButtons[3]).toBeDisabled();
+  });
+
+  it('appends next-page search results when load more is clicked', async () => {
+    searchImagesMock.mockImplementation((_: string, __: string, ___: string, start?: number) => {
+      if ((start ?? 1) === 1) {
+        return Promise.resolve(makeSearchResults(10, 1));
+      }
+
+      if (start === 11) {
+        return Promise.resolve(makeSearchResults(2, 11));
+      }
+
+      return Promise.resolve([]);
+    });
+
+    render(
+      <ImageSelector
+        flashcard={makeFlashcard()}
+        noteType={ENGLISH_PICTURE_WORDS}
+        onSelect={vi.fn()}
+      />,
+    );
+
+    await waitFor(() =>
+      expect(screen.getAllByRole('button', { name: /select image/i })).toHaveLength(10),
+    );
+    const loadMoreButton = screen.getByRole('button', { name: /load more images/i });
+
+    fireEvent.click(loadMoreButton);
+
+    await waitFor(() =>
+      expect(screen.getAllByRole('button', { name: /select image/i })).toHaveLength(12),
+    );
+    expect(screen.queryByRole('button', { name: /load more images/i })).not.toBeInTheDocument();
+
+    expect(
+      searchImagesMock.mock.calls.some(
+        (call) =>
+          call[0] === 'apple' &&
+          call[1] === 'test-gkey' &&
+          call[2] === 'test-cse-id' &&
+          call[3] === 11,
+      ),
+    ).toBe(true);
+  });
+
+  it('keeps selected and existing images after loading more results', async () => {
+    const onSelect = vi.fn();
+    searchImagesMock.mockImplementation((_: string, __: string, ___: string, start?: number) => {
+      if ((start ?? 1) === 1) {
+        return Promise.resolve(makeSearchResults(10, 1));
+      }
+
+      if (start === 11) {
+        return Promise.resolve(makeSearchResults(2, 11));
+      }
+
+      return Promise.resolve([]);
+    });
+
+    render(
+      <ImageSelector
+        flashcard={makeFlashcard()}
+        noteType={ENGLISH_PICTURE_WORDS}
+        onSelect={onSelect}
+      />,
+    );
+
+    await waitFor(() =>
+      expect(screen.getAllByRole('button', { name: /select image/i })).toHaveLength(10),
+    );
+
+    let imageButtons = screen.getAllByRole('button', { name: /select image/i });
+    fireEvent.click(imageButtons[0] as HTMLButtonElement);
+
+    expect(
+      screen.getByText((_, element) => element?.textContent === '1 / 2 images selected'),
+    ).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: /load more images/i }));
+
+    await waitFor(() =>
+      expect(screen.getAllByRole('button', { name: /select image/i })).toHaveLength(12),
+    );
+    expect(
+      screen.getByText((_, element) => element?.textContent === '1 / 2 images selected'),
+    ).toBeInTheDocument();
+
+    imageButtons = screen.getAllByRole('button', { name: /select image/i });
+    expect(imageButtons[0]).toBeInTheDocument();
+    expect(onSelect).toHaveBeenCalledTimes(1);
+  });
+
+  it('disables load-more while loading and hides it when no more results are available', async () => {
+    let resolveLoadMore: ((value: ReturnType<typeof makeSearchResults>) => void) | undefined;
+
+    searchImagesMock.mockImplementation((_: string, __: string, ___: string, start?: number) => {
+      if ((start ?? 1) === 1) {
+        return Promise.resolve(makeSearchResults(10, 1));
+      }
+
+      if (start === 11) {
+        return new Promise((resolve) => {
+          resolveLoadMore = resolve;
+        });
+      }
+
+      return Promise.resolve([]);
+    });
+
+    render(
+      <ImageSelector
+        flashcard={makeFlashcard()}
+        noteType={ENGLISH_PICTURE_WORDS}
+        onSelect={vi.fn()}
+      />,
+    );
+
+    const loadMoreButton = await screen.findByRole('button', { name: /load more images/i });
+    const initialLoadMoreCalls = searchImagesMock.mock.calls.filter(
+      (call) => call[3] === 11,
+    ).length;
+
+    fireEvent.click(loadMoreButton);
+    await waitFor(() =>
+      expect(searchImagesMock.mock.calls.filter((call) => call[3] === 11)).toHaveLength(
+        initialLoadMoreCalls + 1,
+      ),
+    );
+    expect(loadMoreButton).toBeDisabled();
+    expect(loadMoreButton).toHaveTextContent(/loading/i);
+
+    const loadMoreCallsAfterFirstClick = searchImagesMock.mock.calls.filter(
+      (call) => call[3] === 11,
+    ).length;
+    fireEvent.click(loadMoreButton);
+    expect(searchImagesMock.mock.calls.filter((call) => call[3] === 11)).toHaveLength(
+      loadMoreCallsAfterFirstClick,
+    );
+
+    await act(async () => {
+      resolveLoadMore?.([]);
+    });
+
+    await waitFor(() =>
+      expect(screen.queryByRole('button', { name: /load more images/i })).not.toBeInTheDocument(),
+    );
+  });
+
+  it('does not render load-more control when first page has fewer than 10 results', async () => {
+    searchImagesMock.mockResolvedValueOnce(makeSearchResults(3, 1));
+
+    render(
+      <ImageSelector
+        flashcard={makeFlashcard()}
+        noteType={ENGLISH_PICTURE_WORDS}
+        onSelect={vi.fn()}
+      />,
+    );
+
+    await waitFor(() =>
+      expect(screen.getAllByRole('button', { name: /select image/i })).toHaveLength(3),
+    );
+    expect(screen.queryByRole('button', { name: /load more images/i })).not.toBeInTheDocument();
+  });
+
+  it('shows load-more errors, keeps current results, and allows retry', async () => {
+    let loadMoreAttemptCount = 0;
+
+    searchImagesMock.mockImplementation((_: string, __: string, ___: string, start?: number) => {
+      if ((start ?? 1) === 1) {
+        return Promise.resolve(makeSearchResults(10, 1));
+      }
+
+      if (start === 11) {
+        loadMoreAttemptCount += 1;
+        if (loadMoreAttemptCount === 1) {
+          return Promise.reject(new Error('Rate limited'));
+        }
+
+        return Promise.resolve(makeSearchResults(1, 11));
+      }
+
+      return Promise.resolve([]);
+    });
+
+    render(
+      <ImageSelector
+        flashcard={makeFlashcard()}
+        noteType={ENGLISH_PICTURE_WORDS}
+        onSelect={vi.fn()}
+      />,
+    );
+
+    await waitFor(() =>
+      expect(screen.getAllByRole('button', { name: /select image/i })).toHaveLength(10),
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: /load more images/i }));
+
+    await waitFor(() => expect(screen.getByText('Rate limited')).toBeInTheDocument());
+    expect(screen.getAllByRole('button', { name: /select image/i })).toHaveLength(10);
+
+    fireEvent.click(screen.getByRole('button', { name: /load more images/i }));
+
+    await waitFor(() =>
+      expect(screen.getAllByRole('button', { name: /select image/i })).toHaveLength(11),
+    );
+    expect(screen.queryByText('Rate limited')).not.toBeInTheDocument();
+
+    expect(
+      searchImagesMock.mock.calls.filter((call) => call[3] === 11).length,
+    ).toBeGreaterThanOrEqual(2);
+  });
+
+  it('ignores stale load-more responses after a new search starts', async () => {
+    let resolveLoadMore: ((value: ReturnType<typeof makeSearchResults>) => void) | undefined;
+
+    searchImagesMock.mockImplementation((query: string, _: string, __: string, start?: number) => {
+      const effectiveStart = start ?? 1;
+
+      if (query === 'apple' && effectiveStart === 1) {
+        return Promise.resolve(makeSearchResults(10, 1));
+      }
+
+      if (query === 'apple' && effectiveStart === 11) {
+        return new Promise((resolve) => {
+          resolveLoadMore = resolve;
+        });
+      }
+
+      if (query === 'banana' && effectiveStart === 1) {
+        return Promise.resolve(makeSearchResults(3, 101));
+      }
+
+      return Promise.resolve([]);
+    });
+
+    render(
+      <ImageSelector
+        flashcard={makeFlashcard()}
+        noteType={ENGLISH_PICTURE_WORDS}
+        onSelect={vi.fn()}
+      />,
+    );
+
+    await waitFor(() =>
+      expect(screen.getAllByRole('button', { name: /select image/i })).toHaveLength(10),
+    );
+
+    const loadMoreButton = await screen.findByRole('button', { name: /load more images/i });
+    fireEvent.click(loadMoreButton);
+    await waitFor(() => expect(loadMoreButton).toBeDisabled());
+
+    fireEvent.change(screen.getByPlaceholderText(/search for images/i), {
+      target: { value: 'banana' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /^search$/i }));
+
+    await waitFor(() =>
+      expect(screen.getAllByRole('button', { name: /select image/i })).toHaveLength(3),
+    );
+    expect(screen.queryByRole('button', { name: /load more images/i })).not.toBeInTheDocument();
+
+    await act(async () => {
+      resolveLoadMore?.(makeSearchResults(2, 11));
+    });
+
+    await waitFor(() =>
+      expect(screen.getAllByRole('button', { name: /select image/i })).toHaveLength(3),
+    );
   });
 });
