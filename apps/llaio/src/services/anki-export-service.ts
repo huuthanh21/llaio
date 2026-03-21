@@ -1,9 +1,14 @@
 import type { Flashcard, NoteType } from '@/models/flashcard';
 import { createDeck, createModel, createNote, createPackage } from '@/services/genanki-service';
 
-const PROXY_BASE_URL = import.meta.env.DEV
-  ? 'http://localhost:3000/api/proxy-image?url='
-  : 'https://llaio-api.vercel.app/api/proxy-image?url=';
+const DEFAULT_PROXY_API_BASE_URL = import.meta.env.DEV
+  ? 'http://localhost:3000'
+  : 'https://llaio-api.vercel.app';
+
+const proxyApiBaseUrl =
+  import.meta.env.VITE_PROXY_API_BASE_URL?.replace(/\/$/, '') ?? DEFAULT_PROXY_API_BASE_URL;
+
+const PROXY_BASE_URL = `${proxyApiBaseUrl}/api/proxy-image?url=`;
 
 function generateDeckId(deckName: string): number {
   let hash = 0;
