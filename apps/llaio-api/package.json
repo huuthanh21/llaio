@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "bun run index.ts",
     "start": "bun run index.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "bun test"
   },
   "devDependencies": {
     "@vercel/node": "^5.3.25",
