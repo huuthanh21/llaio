@@ -22,6 +22,13 @@ Instead use:
 
 ## REDIRECTED tools — use sandbox equivalents
 
+## Vercel ESM import safety
+
+When editing `api/*.ts` serverless handlers:
+- Imports that target `../src/*` MUST include a `.js` extension (example: `../src/pronunciation.js`).
+- Do not use extensionless `../src/*` imports in API handlers; they can pass locally but fail in Vercel runtime with `ERR_MODULE_NOT_FOUND`.
+- Before finishing, verify with: `grep -R "from \"\.\./src/" api/*.ts` and ensure handler imports use `.js`.
+
 ### Shell (>20 lines output)
 Shell is ONLY for: `git`, `mkdir`, `rm`, `mv`, `cd`, `ls`, `npm install`, `pip install`, and other short-output commands.
 For everything else, use:

@@ -3,7 +3,7 @@ import {
   fetchPronunciationAudio,
   type PronunciationPayload,
   type PronunciationResult,
-} from "../src/pronunciation";
+} from "../src/pronunciation.js";
 
 type PronunciationFetcher = (payload: PronunciationPayload) => Promise<PronunciationResult>;
 

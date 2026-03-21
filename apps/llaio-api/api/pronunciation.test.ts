@@ -6,7 +6,7 @@ import {
 import type {
   PronunciationPayload,
   PronunciationResult,
-} from "../src/pronunciation";
+} from "../src/pronunciation.js";
 
 const originalAllowedOrigins = process.env.ALLOWED_ORIGINS;
 
