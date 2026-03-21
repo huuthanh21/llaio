@@ -2,7 +2,7 @@ import { GoogleAuth } from "google-auth-library";
 import { existsSync, readFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
-import { TTS_LANGUAGE_CODES, type TtsTargetLanguage } from "./config";
+import { TTS_LANGUAGE_CODES, type TtsTargetLanguage } from "./config.js";
 
 const REQUEST_TIMEOUT_MS = 15000;
 const GOOGLE_TTS_ENDPOINT = "https://texttospeech.googleapis.com/v1/text:synthesize";

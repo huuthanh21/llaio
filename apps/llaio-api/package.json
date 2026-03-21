@@ -8,6 +8,7 @@
     "start": "bun run index.ts",
     "typecheck": "tsc --noEmit",
     "test": "bun test",
+    "test:runtime-imports": "bun test src/runtime-imports.test.ts",
     "check:vercel-esm-imports": "node scripts/check-vercel-esm-imports.mjs"
   },
   "devDependencies": {
