@@ -1,9 +1,18 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { WordDefinition } from '../word-definition';
+import { playPronunciation } from '@/services/pronunciation-service';
+import { generateDefinition } from '@/services/gemini-service';
+
+let mockedTargetLanguage = 'English';
+let mockedNativeLanguage = 'Vietnamese';
 
 vi.mock('@/services/gemini-service', () => ({
   generateDefinition: vi.fn(),
+}));
+
+vi.mock('@/services/pronunciation-service', () => ({
+  playPronunciation: vi.fn(),
 }));
 
 vi.mock('@/services/word-history-service', () => ({
@@ -30,8 +39,8 @@ vi.mock('@/stores', () => ({
     setGoogleCseApiKey: vi.fn(),
   }),
   useLanguageStore: () => ({
-    targetLanguage: 'English',
-    nativeLanguage: 'Vietnamese',
+    targetLanguage: mockedTargetLanguage,
+    nativeLanguage: mockedNativeLanguage,
     setLanguage: vi.fn(),
     setNativeLanguage: vi.fn(),
   }),
@@ -53,6 +62,33 @@ vi.mock('@/stores', () => ({
 describe('WordDefinition', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockedTargetLanguage = 'English';
+    mockedNativeLanguage = 'Vietnamese';
+    vi.stubGlobal(
+      'Audio',
+      class {
+        public currentTime = 0;
+        public onended: (() => void) | null = null;
+        public onerror: (() => void) | null = null;
+
+        pause() {
+          return undefined;
+        }
+
+        play() {
+          return Promise.resolve();
+        }
+      },
+    );
+    Object.defineProperty(globalThis.URL, 'revokeObjectURL', {
+      writable: true,
+      configurable: true,
+      value: vi.fn(),
+    });
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
   });
 
   it('renders the word input field', () => {
@@ -94,5 +130,110 @@ describe('WordDefinition', () => {
   it('does not render history select placeholder when history is empty', () => {
     render(<WordDefinition />);
     expect(screen.queryByText('Recent words')).toBeNull();
+  });
+
+  it('renders pronunciation button after a successful definition', async () => {
+    const mockedGenerateDefinition = vi.mocked(generateDefinition);
+    mockedGenerateDefinition.mockImplementation(async (_word, _key, _target, _native, onChunk) => {
+      onChunk('A lucky discovery by chance.');
+    });
+
+    render(<WordDefinition />);
+
+    const input = screen.getByPlaceholderText('e.g. Serendipity');
+    fireEvent.change(input, { target: { value: 'serendipity' } });
+    fireEvent.click(screen.getByText('Define'));
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /play pronunciation for serendipity/i })).toBeTruthy();
+    });
+  });
+
+  it('plays pronunciation for successful lookup', async () => {
+    const mockedGenerateDefinition = vi.mocked(generateDefinition);
+    mockedGenerateDefinition.mockImplementation(async (_word, _key, _target, _native, onChunk) => {
+      onChunk('A lucky discovery by chance.');
+    });
+
+    const mockedPlayPronunciation = vi.mocked(playPronunciation);
+    mockedPlayPronunciation.mockResolvedValue({
+      ok: true,
+      audioUrl: 'blob:playback-url',
+    });
+
+    render(<WordDefinition />);
+
+    fireEvent.change(screen.getByPlaceholderText('e.g. Serendipity'), {
+      target: { value: 'serendipity' },
+    });
+    fireEvent.click(screen.getByText('Define'));
+
+    const pronounceButton = await screen.findByRole('button', {
+      name: /play pronunciation for serendipity/i,
+    });
+    fireEvent.click(pronounceButton);
+
+    await waitFor(() => {
+      expect(mockedPlayPronunciation).toHaveBeenCalledWith('serendipity', 'English');
+    });
+  });
+
+  it('shows pronunciation error when service fails', async () => {
+    const mockedGenerateDefinition = vi.mocked(generateDefinition);
+    mockedGenerateDefinition.mockImplementation(async (_word, _key, _target, _native, onChunk) => {
+      onChunk('A lucky discovery by chance.');
+    });
+
+    const mockedPlayPronunciation = vi.mocked(playPronunciation);
+    mockedPlayPronunciation.mockResolvedValue({
+      ok: false,
+      error: 'Pronunciation quota exceeded',
+    });
+
+    render(<WordDefinition />);
+
+    fireEvent.change(screen.getByPlaceholderText('e.g. Serendipity'), {
+      target: { value: 'serendipity' },
+    });
+    fireEvent.click(screen.getByText('Define'));
+
+    const pronounceButton = await screen.findByRole('button', {
+      name: /play pronunciation for serendipity/i,
+    });
+    fireEvent.click(pronounceButton);
+
+    await waitFor(() => {
+      expect(screen.getByText('Pronunciation quota exceeded')).toBeTruthy();
+    });
+  });
+
+  it('resets lookup state when target language changes', async () => {
+    const mockedGenerateDefinition = vi.mocked(generateDefinition);
+    mockedGenerateDefinition.mockImplementation(async (_word, _key, _target, _native, onChunk) => {
+      onChunk('A lucky discovery by chance.');
+    });
+
+    const { rerender } = render(<WordDefinition />);
+
+    fireEvent.change(screen.getByPlaceholderText('e.g. Serendipity'), {
+      target: { value: 'serendipity' },
+    });
+    fireEvent.click(screen.getByText('Define'));
+
+    await screen.findByRole('button', {
+      name: /play pronunciation for serendipity/i,
+    });
+
+    expect(screen.queryByText('Look up any word')).toBeNull();
+
+    mockedTargetLanguage = 'Spanish';
+    rerender(<WordDefinition />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Look up any word')).toBeTruthy();
+    });
+
+    expect(screen.queryByRole('button', { name: /play pronunciation for serendipity/i })).toBeNull();
+    expect((screen.getByPlaceholderText('e.g. Serendipity') as HTMLInputElement).value).toBe('');
   });
 });

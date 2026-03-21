@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { marked } from 'marked';
-import { Bookmark, RotateCcw } from 'lucide-react';
+import { Bookmark, RotateCcw, Volume2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
@@ -25,6 +25,7 @@ import {
   saveWord,
   subscribeSavedWordsChanges,
 } from '@/services/saved-words-service';
+import { playPronunciation } from '@/services/pronunciation-service';
 import { useLanguageStore, useSettingsStore } from '@/stores';
 import { ContentStatus } from './content-status';
 
@@ -43,8 +44,14 @@ export function WordDefinition() {
   const [history, setHistory] = useState<HistoryEntry[]>([]);
   const [isSaved, setIsSaved] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [pronunciationError, setPronunciationError] = useState<string | null>(null);
+  const [isPronunciationLoading, setIsPronunciationLoading] = useState(false);
+  const [isPronunciationPlaying, setIsPronunciationPlaying] = useState(false);
 
   const abortControllerRef = useRef<AbortController | null>(null);
+  const pronunciationAudioRef = useRef<HTMLAudioElement | null>(null);
+  const pronunciationAudioUrlRef = useRef<string | null>(null);
+  const pronunciationRequestRef = useRef(0);
 
   const historyWords = useMemo(() => {
     return history.map((entry) => entry.word);
@@ -56,6 +63,29 @@ export function WordDefinition() {
     }
     return marked.parse(definition) as string;
   }, [definition]);
+
+  const releasePronunciationAudioUrl = useCallback(() => {
+    if (!pronunciationAudioUrlRef.current) {
+      return;
+    }
+
+    URL.revokeObjectURL(pronunciationAudioUrlRef.current);
+    pronunciationAudioUrlRef.current = null;
+  }, []);
+
+  const stopPronunciationPlayback = useCallback(() => {
+    const currentAudio = pronunciationAudioRef.current;
+    if (currentAudio) {
+      currentAudio.pause();
+      currentAudio.currentTime = 0;
+      currentAudio.onended = null;
+      currentAudio.onerror = null;
+      pronunciationAudioRef.current = null;
+    }
+
+    releasePronunciationAudioUrl();
+    setIsPronunciationPlaying(false);
+  }, [releasePronunciationAudioUrl]);
 
   const loadHistory = useCallback(() => {
     const entries = getHistory(targetLanguage, nativeLanguage);
@@ -90,9 +120,25 @@ export function WordDefinition() {
 
   useEffect(() => {
     return () => {
+      pronunciationRequestRef.current += 1;
       abortControllerRef.current?.abort();
+      stopPronunciationPlayback();
     };
-  }, []);
+  }, [stopPronunciationPlayback]);
+
+  useEffect(() => {
+    abortControllerRef.current?.abort();
+    abortControllerRef.current = null;
+    pronunciationRequestRef.current += 1;
+    stopPronunciationPlayback();
+    setWord('');
+    setDefinition('');
+    setError(null);
+    setSaveError(null);
+    setPronunciationError(null);
+    setIsPronunciationLoading(false);
+    setStatus('idle');
+  }, [targetLanguage, nativeLanguage, stopPronunciationPlayback]);
 
   const runDefinition = async (inputWord: string) => {
     const trimmedWord = inputWord.trim();
@@ -114,6 +160,10 @@ export function WordDefinition() {
     setStatus('loading');
     setError(null);
     setDefinition('');
+    setPronunciationError(null);
+    setIsPronunciationLoading(false);
+    stopPronunciationPlayback();
+    pronunciationRequestRef.current += 1;
     let streamedText = '';
 
     try {
@@ -160,10 +210,14 @@ export function WordDefinition() {
   const handleReset = () => {
     abortControllerRef.current?.abort();
     abortControllerRef.current = null;
+    pronunciationRequestRef.current += 1;
+    stopPronunciationPlayback();
     setWord('');
     setDefinition('');
     setError(null);
     setSaveError(null);
+    setPronunciationError(null);
+    setIsPronunciationLoading(false);
     setStatus('idle');
   };
 
@@ -191,12 +245,76 @@ export function WordDefinition() {
   const handleSelectHistory = (selectedWord: string) => {
     abortControllerRef.current?.abort();
     abortControllerRef.current = null;
+    pronunciationRequestRef.current += 1;
+    stopPronunciationPlayback();
+    setPronunciationError(null);
+    setIsPronunciationLoading(false);
     setWord(selectedWord);
     const cached = getCachedResponse(selectedWord, targetLanguage, nativeLanguage);
     if (cached) {
       setDefinition(cached);
       setError(null);
       setStatus('success');
+    }
+  };
+
+  const handlePlayPronunciation = async () => {
+    const trimmedWord = word.trim();
+    if (!trimmedWord || status !== 'success') {
+      return;
+    }
+
+    const requestId = pronunciationRequestRef.current + 1;
+    pronunciationRequestRef.current = requestId;
+
+    setPronunciationError(null);
+    setIsPronunciationLoading(true);
+    stopPronunciationPlayback();
+
+    const result = await playPronunciation(trimmedWord, targetLanguage);
+    if (pronunciationRequestRef.current !== requestId) {
+      if (result.audioUrl) {
+        URL.revokeObjectURL(result.audioUrl);
+      }
+      return;
+    }
+
+    if (!result.ok || !result.audioUrl) {
+      setIsPronunciationLoading(false);
+      setIsPronunciationPlaying(false);
+      setPronunciationError(
+        result.error ?? 'Unable to play pronunciation audio right now. Please try again.',
+      );
+      return;
+    }
+
+    pronunciationAudioUrlRef.current = result.audioUrl;
+    const audio = new Audio(result.audioUrl);
+    pronunciationAudioRef.current = audio;
+
+    audio.onended = () => {
+      setIsPronunciationPlaying(false);
+      pronunciationAudioRef.current = null;
+      releasePronunciationAudioUrl();
+    };
+
+    audio.onerror = () => {
+      setIsPronunciationPlaying(false);
+      setPronunciationError('Unable to play pronunciation audio right now. Please try again.');
+      pronunciationAudioRef.current = null;
+      releasePronunciationAudioUrl();
+    };
+
+    try {
+      await audio.play();
+      setIsPronunciationPlaying(true);
+    } catch {
+      setIsPronunciationPlaying(false);
+      setPronunciationError('Your browser blocked audio playback. Click again to retry.');
+      pronunciationAudioRef.current = null;
+      releasePronunciationAudioUrl();
+    } finally {
+      setIsPronunciationLoading(false);
     }
   };
 
@@ -303,6 +421,53 @@ export function WordDefinition() {
       {/* Definition content */}
       <ContentStatus status={status} error={error} hasContent={definition.trim().length > 0}>
         <div className="border-border/60 animate-content-enter rounded-lg border bg-surface-raised p-6">
+          <div className="border-border/40 mb-6 flex items-start justify-between gap-4 border-b pb-5">
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-3">
+                <h2 className="truncate text-3xl font-bold tracking-tight text-foreground">
+                  {word}
+                </h2>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => {
+                    void handlePlayPronunciation();
+                  }}
+                  disabled={isPronunciationLoading || status !== 'success' || !word.trim()}
+                  aria-label={`Play pronunciation for ${word.trim()}`}
+                  title={`Pronounce in ${targetLanguage}`}
+                  className={cn(
+                    'h-10 w-10 shrink-0 rounded-full transition-all duration-300',
+                    isPronunciationPlaying
+                      ? 'bg-foreground text-background hover:bg-foreground/90'
+                      : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+                  )}
+                >
+                  {isPronunciationLoading ? (
+                    <Spinner size="sm" />
+                  ) : (
+                    <Volume2
+                      className={cn(
+                        'size-5 transition-transform duration-300',
+                        isPronunciationPlaying && 'scale-110',
+                      )}
+                    />
+                  )}
+                </Button>
+              </div>
+              <p className="mt-1.5 text-[13px] font-medium text-muted-foreground">
+                {targetLanguage} pronunciation
+              </p>
+            </div>
+          </div>
+
+          {pronunciationError ? (
+            <div className="border-destructive/20 bg-destructive/5 mb-4 rounded-md border px-3 py-2 text-[13px] text-destructive">
+              {pronunciationError}
+            </div>
+          ) : null}
+
           <div
             className="prose max-w-none dark:prose-invert prose-headings:tracking-tight prose-p:leading-relaxed prose-li:leading-relaxed"
             dangerouslySetInnerHTML={{ __html: markedHtml }}

@@ -13,3 +13,16 @@ export function isAllowedOrigin(origin: string | undefined, allowedOrigins: stri
 
   return allowedOrigins.includes(origin);
 }
+
+export const TTS_LANGUAGE_CODES = {
+  English: "en-US",
+  Spanish: "es-ES",
+  French: "fr-FR",
+  German: "de-DE",
+  Japanese: "ja-JP",
+  Italian: "it-IT",
+  Chinese: "cmn-CN",
+  Vietnamese: "vi-VN",
+} as const;
+
+export type TtsTargetLanguage = keyof typeof TTS_LANGUAGE_CODES;
