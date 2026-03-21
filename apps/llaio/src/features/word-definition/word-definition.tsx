@@ -120,10 +120,25 @@ export function WordDefinition() {
 
   useEffect(() => {
     return () => {
+      pronunciationRequestRef.current += 1;
       abortControllerRef.current?.abort();
       stopPronunciationPlayback();
     };
   }, [stopPronunciationPlayback]);
+
+  useEffect(() => {
+    abortControllerRef.current?.abort();
+    abortControllerRef.current = null;
+    pronunciationRequestRef.current += 1;
+    stopPronunciationPlayback();
+    setWord('');
+    setDefinition('');
+    setError(null);
+    setSaveError(null);
+    setPronunciationError(null);
+    setIsPronunciationLoading(false);
+    setStatus('idle');
+  }, [targetLanguage, nativeLanguage, stopPronunciationPlayback]);
 
   const runDefinition = async (inputWord: string) => {
     const trimmedWord = inputWord.trim();

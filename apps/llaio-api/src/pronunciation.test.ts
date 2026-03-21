@@ -216,7 +216,7 @@ describe("fetchPronunciationAudio", () => {
     expect(callCount).toBe(1);
     expect(result.status).toBe(200);
     expect(result.headers["Content-Type"]).toBe("audio/mpeg");
-    expect(result.headers["Cache-Control"]).toBe("public, max-age=86400");
+    expect(result.headers["Cache-Control"]).toBe("public, max-age=172800");
     expect(Array.from(result.body ?? Buffer.alloc(0))).toEqual([1, 2, 3, 4]);
   });
 

@@ -4,6 +4,9 @@ import { WordDefinition } from '../word-definition';
 import { playPronunciation } from '@/services/pronunciation-service';
 import { generateDefinition } from '@/services/gemini-service';
 
+let mockedTargetLanguage = 'English';
+let mockedNativeLanguage = 'Vietnamese';
+
 vi.mock('@/services/gemini-service', () => ({
   generateDefinition: vi.fn(),
 }));
@@ -36,8 +39,8 @@ vi.mock('@/stores', () => ({
     setGoogleCseApiKey: vi.fn(),
   }),
   useLanguageStore: () => ({
-    targetLanguage: 'English',
-    nativeLanguage: 'Vietnamese',
+    targetLanguage: mockedTargetLanguage,
+    nativeLanguage: mockedNativeLanguage,
     setLanguage: vi.fn(),
     setNativeLanguage: vi.fn(),
   }),
@@ -59,6 +62,8 @@ vi.mock('@/stores', () => ({
 describe('WordDefinition', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockedTargetLanguage = 'English';
+    mockedNativeLanguage = 'Vietnamese';
     vi.stubGlobal(
       'Audio',
       class {
@@ -200,5 +205,35 @@ describe('WordDefinition', () => {
     await waitFor(() => {
       expect(screen.getByText('Pronunciation quota exceeded')).toBeTruthy();
     });
+  });
+
+  it('resets lookup state when target language changes', async () => {
+    const mockedGenerateDefinition = vi.mocked(generateDefinition);
+    mockedGenerateDefinition.mockImplementation(async (_word, _key, _target, _native, onChunk) => {
+      onChunk('A lucky discovery by chance.');
+    });
+
+    const { rerender } = render(<WordDefinition />);
+
+    fireEvent.change(screen.getByPlaceholderText('e.g. Serendipity'), {
+      target: { value: 'serendipity' },
+    });
+    fireEvent.click(screen.getByText('Define'));
+
+    await screen.findByRole('button', {
+      name: /play pronunciation for serendipity/i,
+    });
+
+    expect(screen.queryByText('Look up any word')).toBeNull();
+
+    mockedTargetLanguage = 'Spanish';
+    rerender(<WordDefinition />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Look up any word')).toBeTruthy();
+    });
+
+    expect(screen.queryByRole('button', { name: /play pronunciation for serendipity/i })).toBeNull();
+    expect((screen.getByPlaceholderText('e.g. Serendipity') as HTMLInputElement).value).toBe('');
   });
 });

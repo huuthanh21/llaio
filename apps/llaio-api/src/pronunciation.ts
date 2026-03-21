@@ -7,7 +7,8 @@ import { TTS_LANGUAGE_CODES, type TtsTargetLanguage } from "./config";
 const REQUEST_TIMEOUT_MS = 15000;
 const GOOGLE_TTS_ENDPOINT = "https://texttospeech.googleapis.com/v1/text:synthesize";
 const MAX_TEXT_BYTES = 5000;
-const PRONUNCIATION_CACHE_TTL_MS = 1000 * 60 * 60 * 12;
+const PRONUNCIATION_CACHE_TTL_MS = 1000 * 60 * 60 * 24 * 2;
+const PRONUNCIATION_CACHE_CONTROL = `public, max-age=${PRONUNCIATION_CACHE_TTL_MS / 1000}`;
 const MAX_CACHE_ENTRIES = 500;
 
 const FALLBACK_VOICES: Record<TtsTargetLanguage, string[]> = {
@@ -403,7 +404,7 @@ export async function fetchPronunciationAudio(
       status: 200,
       headers: {
         "Content-Type": "audio/mpeg",
-        "Cache-Control": "public, max-age=86400",
+        "Cache-Control": PRONUNCIATION_CACHE_CONTROL,
       },
       body: cachedAudio,
     };
@@ -432,7 +433,7 @@ export async function fetchPronunciationAudio(
       status: 200,
       headers: {
         "Content-Type": "audio/mpeg",
-        "Cache-Control": "public, max-age=86400",
+        "Cache-Control": PRONUNCIATION_CACHE_CONTROL,
       },
       body: result.body,
     };
