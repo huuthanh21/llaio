@@ -2,6 +2,11 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 import path from 'path';
+import { readFileSync } from 'fs';
+
+const packageJsonPath = path.resolve(__dirname, 'package.json');
+const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf-8')) as { version?: string };
+const appVersion = packageJson.version ?? '0.0.0';
 
 export default defineConfig({
   plugins: [
@@ -86,5 +91,6 @@ export default defineConfig({
   },
   define: {
     global: 'globalThis',
+    __APP_VERSION__: JSON.stringify(appVersion),
   },
 });

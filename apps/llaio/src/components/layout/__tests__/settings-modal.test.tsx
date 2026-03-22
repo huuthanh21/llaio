@@ -99,6 +99,11 @@ describe('SettingsModal — open', () => {
 
   it('renders the Save button', () => {
     render(<SettingsModal />);
-    expect(screen.getByText('Save')).toBeTruthy();
+    expect(screen.getByText('Save Changes')).toBeTruthy();
+  });
+
+  it('renders the app version label', () => {
+    render(<SettingsModal />);
+    expect(screen.getByText((content) => content.startsWith('Version '))).toBeTruthy();
   });
 });

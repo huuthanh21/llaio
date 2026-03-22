@@ -147,7 +147,9 @@ describe('WordDefinition', () => {
     fireEvent.click(screen.getByText('Define'));
 
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: /play pronunciation for serendipity/i })).toBeTruthy();
+      expect(
+        screen.getByRole('button', { name: /play pronunciation for serendipity/i }),
+      ).toBeTruthy();
     });
   });
 
@@ -272,7 +274,9 @@ describe('WordDefinition', () => {
       expect(screen.getByText('Look up any word')).toBeTruthy();
     });
 
-    expect(screen.queryByRole('button', { name: /play pronunciation for serendipity/i })).toBeNull();
+    expect(
+      screen.queryByRole('button', { name: /play pronunciation for serendipity/i }),
+    ).toBeNull();
     expect((screen.getByPlaceholderText('e.g. Serendipity') as HTMLInputElement).value).toBe('');
   });
 });
