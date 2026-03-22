@@ -68,6 +68,7 @@ Search results can flood context. Use `context-mode_ctx_execute(language: "shell
 
 - This repo uses Release Please for automated versioning and changelog generation.
 - Do NOT run `bunx changeset` and do NOT create `.changeset/*` files.
+- Release Please PRs are auto-merged by workflow after checks pass; do not wait for manual maintainer approval for routine version bumps.
 - Release Please workflow prefers `RELEASE_PLEASE_TOKEN` (if set) and falls back to `GITHUB_TOKEN`; when org policy blocks PR creation, configure `RELEASE_PLEASE_TOKEN` with contents + pull requests write permissions.
 - Follow Conventional Commits in commit messages and PR titles:
   - `feat:` -> minor release
