@@ -19,3 +19,12 @@ This repository contains both the frontend app and API service.
 - API (`apps/llaio-api/.env`):
   - `PORT`
   - `ALLOWED_ORIGINS`
+
+## Releases
+
+- This repo uses Release Please and Conventional Commits.
+- Do not use Changesets (`bunx changeset`) in this repository.
+- Release automation runs on pushes to `master` and opens release PRs automatically.
+- Package version sources:
+  - Frontend app (`apps/llaio`) -> `apps/llaio/package.json`
+  - API service (`apps/llaio-api`) -> `apps/llaio-api/package.json`

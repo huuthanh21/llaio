@@ -1,0 +1,22 @@
+name: conventional-pr-title
+
+on:
+  pull_request_target:
+    types: [opened, edited, synchronize, reopened]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate PR title against Conventional Commits
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          pattern='^(feat|fix|perf|refactor|docs|test|build|ci|chore|revert)(\([a-z0-9-]+\))?!?: .+'
+          if [[ ! "$PR_TITLE" =~ $pattern ]]; then
+            echo "Invalid PR title: $PR_TITLE"
+            echo "Expected: <type>(<optional-scope>): <description>"
+            echo "Examples: feat(llaio): add settings version label"
+            echo "          fix(llaio-api): handle empty origin header"
+            exit 1
+          fi

@@ -81,13 +81,13 @@ export function SettingsModal() {
               value={localApiKey}
               onChange={(e) => setLocalApiKey(e.target.value)}
             />
-            <p className="text-[12px] text-muted-foreground">
+            <p className="text-[12px] leading-relaxed text-muted-foreground">
               Your key is stored locally and never sent to our servers.{' '}
               <a
                 href="https://aistudio.google.com/app/apikey"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="underline transition-colors hover:text-foreground"
+                className="decoration-muted-foreground/40 font-medium text-foreground underline underline-offset-4 transition-all hover:decoration-foreground"
               >
                 Get API Key
               </a>
@@ -107,13 +107,13 @@ export function SettingsModal() {
               value={localGoogleCseApiKey}
               onChange={(e) => setLocalGoogleCseApiKey(e.target.value)}
             />
-            <p className="text-[12px] text-muted-foreground">
+            <p className="text-[12px] leading-relaxed text-muted-foreground">
               Used for image search in flashcard generation.{' '}
               <a
                 href="https://programmablesearchengine.google.com/controlpanel/all"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="underline transition-colors hover:text-foreground"
+                className="decoration-muted-foreground/40 font-medium text-foreground underline underline-offset-4 transition-all hover:decoration-foreground"
               >
                 Get API Key
               </a>
@@ -131,7 +131,7 @@ export function SettingsModal() {
               <SelectContent>
                 {THEMES.map((t) => (
                   <SelectItem key={t} value={t}>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2.5">
                       {t === 'System' && <Monitor className="size-4 opacity-60" />}
                       {t === 'Light' && <Sun className="size-4 opacity-60" />}
                       {t === 'Dark' && <Moon className="size-4 opacity-60" />}
@@ -162,14 +162,19 @@ export function SettingsModal() {
                 ))}
               </SelectContent>
             </Select>
-            <p className="text-[12px] text-muted-foreground">
+            <p className="text-[12px] leading-relaxed text-muted-foreground">
               Translations and explanations will be in this language.
             </p>
           </div>
         </div>
 
-        <DialogFooter>
-          <Button onClick={handleSave}>Save</Button>
+        <DialogFooter className="mt-2 sm:items-center">
+          <p className="text-muted-foreground/70 text-[12px] sm:mr-auto">
+            Version {__APP_VERSION__}
+          </p>
+          <Button onClick={handleSave} className="w-full sm:w-auto">
+            Save Changes
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

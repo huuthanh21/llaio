@@ -1,0 +1,16 @@
+{
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+  "separate-pull-requests": true,
+  "packages": {
+    "apps/llaio": {
+      "component": "llaio",
+      "release-type": "node",
+      "package-name": "llaio"
+    },
+    "apps/llaio-api": {
+      "component": "llaio-api",
+      "release-type": "node",
+      "package-name": "llaio-api"
+    }
+  }
+}
