@@ -3,6 +3,7 @@ import type { Language } from '@/stores/language-store';
 export interface HistoryEntry {
   word: string;
   response: string;
+  ipa?: string;
   targetLanguage?: Language;
   nativeLanguage?: Language;
 }
@@ -49,6 +50,7 @@ export function addEntry(
   response: string,
   targetLang: Language,
   nativeLang: Language,
+  ipa?: string,
 ): void {
   if (!word || !response) {
     return;
@@ -68,6 +70,7 @@ export function addEntry(
   const newEntry: HistoryEntry = {
     word,
     response,
+    ipa,
     targetLanguage: targetLang,
     nativeLanguage: nativeLang,
   };
@@ -77,11 +80,51 @@ export function addEntry(
   saveHistory(newHistory);
 }
 
+export function updateEntryIpa(
+  word: string,
+  targetLang: Language,
+  nativeLang: Language,
+  ipa: string,
+): void {
+  if (!word || !ipa) {
+    return;
+  }
+
+  const currentHistory = loadHistory();
+  const entryIndex = currentHistory.findIndex(
+    (entry) =>
+      entry.word.toLowerCase() === word.toLowerCase() &&
+      entry.targetLanguage === targetLang &&
+      entry.nativeLanguage === nativeLang,
+  );
+
+  if (entryIndex === -1) {
+    return;
+  }
+
+  const nextHistory = [...currentHistory];
+  nextHistory[entryIndex] = {
+    ...nextHistory[entryIndex],
+    ipa,
+  };
+
+  saveHistory(nextHistory);
+}
+
 export function getCachedResponse(
   word: string,
   targetLang: Language,
   nativeLang: Language,
 ): string | null {
+  const entry = getCachedEntry(word, targetLang, nativeLang);
+  return entry?.response ?? null;
+}
+
+export function getCachedEntry(
+  word: string,
+  targetLang: Language,
+  nativeLang: Language,
+): HistoryEntry | null {
   const all = loadHistory();
   const entry = all.find(
     (e) =>
@@ -89,7 +132,7 @@ export function getCachedResponse(
       e.targetLanguage === targetLang &&
       e.nativeLanguage === nativeLang,
   );
-  return entry?.response ?? null;
+  return entry ?? null;
 }
 
 export function clearHistory(): void {

@@ -25,7 +25,11 @@ vi.mock('@google/genai', () => {
   };
 });
 
-import { generateDefinition, generateFlashcards } from '../gemini-service';
+import {
+  generateDefinition,
+  generateFlashcards,
+  generatePronunciationIpa,
+} from '../gemini-service';
 
 const targetLang: Language = 'English';
 const nativeLang: Language = 'Vietnamese';
@@ -251,5 +255,57 @@ describe('generateFlashcards', () => {
     await expect(
       generateFlashcards(['word'], 'key', mockNoteType, targetLang, nativeLang),
     ).rejects.toThrow(SyntaxError);
+  });
+});
+
+describe('generatePronunciationIpa', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('returns parsed ipa value from JSON response', async () => {
+    mockGenerateContent.mockResolvedValue({
+      text: JSON.stringify({ ipa: '/həˈloʊ/' }),
+    });
+
+    const result = await generatePronunciationIpa('hello', 'test-api-key', targetLang);
+
+    expect(result).toBe('/həˈloʊ/');
+  });
+
+  it('returns empty string when ipa field is missing', async () => {
+    mockGenerateContent.mockResolvedValue({
+      text: JSON.stringify({ foo: 'bar' }),
+    });
+
+    const result = await generatePronunciationIpa('hello', 'test-api-key', targetLang);
+
+    expect(result).toBe('');
+  });
+
+  it('returns empty string when aborted after response', async () => {
+    mockGenerateContent.mockResolvedValue({
+      text: JSON.stringify({ ipa: '/həˈloʊ/' }),
+    });
+
+    const controller = new AbortController();
+    controller.abort();
+
+    const result = await generatePronunciationIpa(
+      'hello',
+      'test-api-key',
+      targetLang,
+      controller.signal,
+    );
+
+    expect(result).toBe('');
+  });
+
+  it('throws SyntaxError when response text is not valid JSON', async () => {
+    mockGenerateContent.mockResolvedValue({ text: 'not json' });
+
+    await expect(generatePronunciationIpa('hello', 'test-api-key', targetLang)).rejects.toThrow(
+      SyntaxError,
+    );
   });
 });

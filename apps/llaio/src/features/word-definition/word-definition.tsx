@@ -12,12 +12,13 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Spinner } from '@/components/ui/spinner';
-import { generateDefinition } from '@/services/gemini-service';
+import { generateDefinition, generatePronunciationIpa } from '@/services/gemini-service';
 import {
   addEntry,
-  getCachedResponse,
+  getCachedEntry,
   getHistory,
   type HistoryEntry,
+  updateEntryIpa,
 } from '@/services/word-history-service';
 import {
   isWordSaved,
@@ -37,8 +38,10 @@ export function WordDefinition() {
   const { apiKey } = useSettingsStore();
   const { targetLanguage, nativeLanguage } = useLanguageStore();
 
-  const [word, setWord] = useState('');
+  const [inputWord, setInputWord] = useState('');
+  const [currentWord, setCurrentWord] = useState('');
   const [definition, setDefinition] = useState('');
+  const [ipa, setIpa] = useState('');
   const [status, setStatus] = useState<DefinitionStatus>('idle');
   const [error, setError] = useState<string | null>(null);
   const [history, setHistory] = useState<HistoryEntry[]>([]);
@@ -97,25 +100,25 @@ export function WordDefinition() {
   }, [loadHistory]);
 
   useEffect(() => {
-    const trimmedWord = word.trim();
+    const trimmedWord = currentWord.trim();
     if (!trimmedWord) {
       setIsSaved(false);
       return;
     }
 
     setIsSaved(isWordSaved(trimmedWord, targetLanguage));
-  }, [targetLanguage, word]);
+  }, [targetLanguage, currentWord]);
 
   useEffect(
     () =>
       subscribeSavedWordsChanges(() => {
-        const trimmedWord = word.trim();
+        const trimmedWord = currentWord.trim();
         if (!trimmedWord) {
           return;
         }
         setIsSaved(isWordSaved(trimmedWord, targetLanguage));
       }),
-    [targetLanguage, word],
+    [targetLanguage, currentWord],
   );
 
   useEffect(() => {
@@ -131,8 +134,10 @@ export function WordDefinition() {
     abortControllerRef.current = null;
     pronunciationRequestRef.current += 1;
     stopPronunciationPlayback();
-    setWord('');
+    setInputWord('');
+    setCurrentWord('');
     setDefinition('');
+    setIpa('');
     setError(null);
     setSaveError(null);
     setPronunciationError(null);
@@ -156,17 +161,45 @@ export function WordDefinition() {
     const controller = new AbortController();
     abortControllerRef.current = controller;
 
-    setWord(trimmedWord);
+    setInputWord(trimmedWord);
+    setCurrentWord(trimmedWord);
     setStatus('loading');
     setError(null);
     setDefinition('');
+    setIpa('');
     setPronunciationError(null);
     setIsPronunciationLoading(false);
     stopPronunciationPlayback();
     pronunciationRequestRef.current += 1;
     let streamedText = '';
+    let latestIpa = '';
+    let hasSavedHistoryEntry = false;
 
     try {
+      const ipaTask = generatePronunciationIpa(
+        trimmedWord,
+        apiKey,
+        targetLanguage,
+        controller.signal,
+      )
+        .then((value) => {
+          if (controller.signal.aborted) {
+            return '';
+          }
+
+          const normalizedIpa = value.trim();
+          latestIpa = normalizedIpa;
+          setIpa(normalizedIpa);
+          if (normalizedIpa && hasSavedHistoryEntry) {
+            updateEntryIpa(trimmedWord, targetLanguage, nativeLanguage, normalizedIpa);
+            loadHistory();
+          }
+          return normalizedIpa;
+        })
+        .catch(() => {
+          return '';
+        });
+
       await generateDefinition(
         trimmedWord,
         apiKey,
@@ -186,9 +219,12 @@ export function WordDefinition() {
       setStatus('success');
 
       if (streamedText.trim().length > 0) {
-        addEntry(trimmedWord, streamedText, targetLanguage, nativeLanguage);
+        addEntry(trimmedWord, streamedText, targetLanguage, nativeLanguage, latestIpa || undefined);
+        hasSavedHistoryEntry = true;
         loadHistory();
       }
+
+      void ipaTask;
     } catch {
       if (controller.signal.aborted) {
         return;
@@ -204,7 +240,7 @@ export function WordDefinition() {
   };
 
   const handleDefine = async () => {
-    await runDefinition(word);
+    await runDefinition(inputWord);
   };
 
   const handleReset = () => {
@@ -212,8 +248,10 @@ export function WordDefinition() {
     abortControllerRef.current = null;
     pronunciationRequestRef.current += 1;
     stopPronunciationPlayback();
-    setWord('');
+    setInputWord('');
+    setCurrentWord('');
     setDefinition('');
+    setIpa('');
     setError(null);
     setSaveError(null);
     setPronunciationError(null);
@@ -221,14 +259,14 @@ export function WordDefinition() {
     setStatus('idle');
   };
 
-  const canSaveWord = status === 'success' && word.trim().length > 0;
+  const canSaveWord = status === 'success' && currentWord.trim().length > 0;
 
   const handleToggleSavedWord = () => {
     if (!canSaveWord) {
       return;
     }
 
-    const trimmedWord = word.trim();
+    const trimmedWord = currentWord.trim();
     const result = isSaved
       ? removeWord(trimmedWord, targetLanguage)
       : saveWord(trimmedWord, targetLanguage);
@@ -249,17 +287,20 @@ export function WordDefinition() {
     stopPronunciationPlayback();
     setPronunciationError(null);
     setIsPronunciationLoading(false);
-    setWord(selectedWord);
-    const cached = getCachedResponse(selectedWord, targetLanguage, nativeLanguage);
-    if (cached) {
-      setDefinition(cached);
+    setInputWord(selectedWord);
+    setCurrentWord(selectedWord);
+    setIpa('');
+    const cachedEntry = getCachedEntry(selectedWord, targetLanguage, nativeLanguage);
+    if (cachedEntry?.response) {
+      setDefinition(cachedEntry.response);
+      setIpa(cachedEntry?.ipa ?? '');
       setError(null);
       setStatus('success');
     }
   };
 
   const handlePlayPronunciation = async () => {
-    const trimmedWord = word.trim();
+    const trimmedWord = currentWord.trim();
     if (!trimmedWord || status !== 'success') {
       return;
     }
@@ -326,8 +367,8 @@ export function WordDefinition() {
       <div className="flex flex-col gap-3">
         <div className="flex flex-col gap-2 sm:flex-row">
           <Input
-            value={word}
-            onChange={(event) => setWord(event.target.value)}
+            value={inputWord}
+            onChange={(event) => setInputWord(event.target.value)}
             onKeyDown={(event) => {
               if (event.key === 'Enter') {
                 void handleDefine();
@@ -342,7 +383,7 @@ export function WordDefinition() {
               onClick={() => {
                 void handleDefine();
               }}
-              disabled={status === 'loading' || !word.trim()}
+              disabled={status === 'loading' || !inputWord.trim()}
               className="relative h-11 flex-1 overflow-hidden transition-all sm:flex-initial sm:px-6"
             >
               <span
@@ -364,7 +405,7 @@ export function WordDefinition() {
               variant="ghost"
               size="icon"
               onClick={handleReset}
-              disabled={!word && !definition && status === 'idle'}
+              disabled={!inputWord && !definition && status === 'idle'}
               className="h-11 w-11 shrink-0 transition-colors"
               aria-label="Reset"
             >
@@ -425,7 +466,7 @@ export function WordDefinition() {
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-3">
                 <h2 className="truncate text-3xl font-bold tracking-tight text-foreground">
-                  {word}
+                  {currentWord}
                 </h2>
                 <Button
                   type="button"
@@ -434,13 +475,13 @@ export function WordDefinition() {
                   onClick={() => {
                     void handlePlayPronunciation();
                   }}
-                  disabled={isPronunciationLoading || status !== 'success' || !word.trim()}
-                  aria-label={`Play pronunciation for ${word.trim()}`}
+                  disabled={isPronunciationLoading || status !== 'success' || !currentWord.trim()}
+                  aria-label={`Play pronunciation for ${currentWord.trim()}`}
                   title={`Pronounce in ${targetLanguage}`}
                   className={cn(
                     'h-10 w-10 shrink-0 rounded-full transition-all duration-300',
                     isPronunciationPlaying
-                      ? 'bg-foreground text-background hover:bg-foreground/90'
+                      ? 'hover:bg-foreground/90 bg-foreground text-background'
                       : 'text-muted-foreground hover:bg-muted hover:text-foreground',
                   )}
                 >
@@ -456,9 +497,15 @@ export function WordDefinition() {
                   )}
                 </Button>
               </div>
-              <p className="mt-1.5 text-[13px] font-medium text-muted-foreground">
-                {targetLanguage} pronunciation
-              </p>
+              {ipa ? (
+                <p className="mt-1.5 font-mono text-[15px] tracking-tight text-muted-foreground">
+                  {ipa}
+                </p>
+              ) : (
+                <p className="mt-1.5 text-[13px] font-medium text-muted-foreground">
+                  Pronunciation
+                </p>
+              )}
             </div>
           </div>
 

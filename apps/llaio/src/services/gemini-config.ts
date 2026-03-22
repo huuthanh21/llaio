@@ -41,6 +41,32 @@ Structure:
   },
 });
 
+export const getWordPronunciationInstruction = (targetLanguage: Language): GeminiConfig => ({
+  model: 'gemini-3-flash-preview',
+  config: {
+    thinkingConfig: {
+      thinkingLevel: ThinkingLevel.LOW,
+    },
+    responseMimeType: 'application/json',
+    responseSchema: {
+      type: SchemaType.OBJECT,
+      required: ['ipa'],
+      properties: {
+        ipa: {
+          type: SchemaType.STRING,
+          description: `Standard IPA pronunciation for the input ${targetLanguage} word, enclosed in slashes (e.g., /.../). Leave empty if unavailable.`,
+        },
+      },
+    },
+    systemInstruction: [
+      {
+        text: `Role: ${targetLanguage} pronunciation assistant.
+Task: Provide standard IPA transcription for the input word.`,
+      },
+    ],
+  },
+});
+
 export const getFlashcardInstruction = (noteType: NoteType): GeminiConfig => {
   const responseFields = noteType.fields.filter((f) => f.isTitle || f.aiGenerated);
 

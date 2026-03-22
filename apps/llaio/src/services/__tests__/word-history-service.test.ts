@@ -1,6 +1,13 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import type { Language } from '@/stores/language-store';
-import { addEntry, getHistory, getCachedResponse, clearHistory } from '../word-history-service';
+import {
+  addEntry,
+  getCachedEntry,
+  getHistory,
+  getCachedResponse,
+  clearHistory,
+  updateEntryIpa,
+} from '../word-history-service';
 
 const EN: Language = 'English';
 const VI: Language = 'Vietnamese';
@@ -13,7 +20,7 @@ describe('word-history-service', () => {
 
   describe('addEntry + getHistory', () => {
     it('adds a single entry and getHistory returns it for the matching language pair', () => {
-      addEntry('hello', 'a greeting', EN, VI);
+      addEntry('hello', 'a greeting', EN, VI, '/həˈloʊ/');
 
       const history = getHistory(EN, VI);
 
@@ -21,6 +28,7 @@ describe('word-history-service', () => {
       expect(history[0]).toMatchObject({
         word: 'hello',
         response: 'a greeting',
+        ipa: '/həˈloʊ/',
         targetLanguage: EN,
         nativeLanguage: VI,
       });
@@ -125,6 +133,54 @@ describe('word-history-service', () => {
 
       expect(getCachedResponse('hello', EN, VI)).toBe('a greeting');
       expect(getCachedResponse('HELLO', EN, VI)).toBe('a greeting');
+    });
+  });
+
+  describe('getCachedEntry', () => {
+    it('returns the cached entry including ipa for a matching word and language pair', () => {
+      addEntry('serendipity', 'the occurrence of pleasant surprises', EN, VI, '/ˌser.ənˈdɪp.ə.ti/');
+
+      expect(getCachedEntry('serendipity', EN, VI)).toMatchObject({
+        word: 'serendipity',
+        response: 'the occurrence of pleasant surprises',
+        ipa: '/ˌser.ənˈdɪp.ə.ti/',
+      });
+    });
+
+    it('returns null when word is not in history', () => {
+      expect(getCachedEntry('unknown', EN, VI)).toBeNull();
+    });
+  });
+
+  describe('updateEntryIpa', () => {
+    it('updates ipa on an existing cached entry', () => {
+      addEntry('serendipity', 'the occurrence of pleasant surprises', EN, VI);
+
+      updateEntryIpa('serendipity', EN, VI, '/ˌser.ənˈdɪp.ə.ti/');
+
+      expect(getCachedEntry('serendipity', EN, VI)).toMatchObject({
+        word: 'serendipity',
+        response: 'the occurrence of pleasant surprises',
+        ipa: '/ˌser.ənˈdɪp.ə.ti/',
+      });
+    });
+
+    it('does nothing when matching entry is missing', () => {
+      updateEntryIpa('unknown', EN, VI, '/x/');
+
+      expect(getCachedEntry('unknown', EN, VI)).toBeNull();
+    });
+
+    it('does nothing when ipa is empty', () => {
+      addEntry('hello', 'a greeting', EN, VI);
+
+      updateEntryIpa('hello', EN, VI, '');
+
+      expect(getCachedEntry('hello', EN, VI)).toMatchObject({
+        word: 'hello',
+        response: 'a greeting',
+      });
+      expect(getCachedEntry('hello', EN, VI)?.ipa).toBeUndefined();
     });
   });
 

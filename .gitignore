@@ -24,3 +24,5 @@ logs/
 .planning/
 node-compile-cache/
 test-results/
+.vercel
+.env*.local
