@@ -2,13 +2,14 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { WordDefinition } from '../word-definition';
 import { playPronunciation } from '@/services/pronunciation-service';
-import { generateDefinition } from '@/services/gemini-service';
+import { generateDefinition, generatePronunciationIpa } from '@/services/gemini-service';
 
 let mockedTargetLanguage = 'English';
 let mockedNativeLanguage = 'Vietnamese';
 
 vi.mock('@/services/gemini-service', () => ({
   generateDefinition: vi.fn(),
+  generatePronunciationIpa: vi.fn(),
 }));
 
 vi.mock('@/services/pronunciation-service', () => ({
@@ -18,7 +19,7 @@ vi.mock('@/services/pronunciation-service', () => ({
 vi.mock('@/services/word-history-service', () => ({
   getHistory: vi.fn(() => []),
   addEntry: vi.fn(),
-  getCachedResponse: vi.fn(() => null),
+  getCachedEntry: vi.fn(() => null),
 }));
 
 vi.mock('@/services/saved-words-service', () => ({
@@ -64,6 +65,7 @@ describe('WordDefinition', () => {
     vi.clearAllMocks();
     mockedTargetLanguage = 'English';
     mockedNativeLanguage = 'Vietnamese';
+    vi.mocked(generatePronunciationIpa).mockResolvedValue('/ˌser.ənˈdɪp.ə.ti/');
     vi.stubGlobal(
       'Audio',
       class {
@@ -146,6 +148,43 @@ describe('WordDefinition', () => {
 
     await waitFor(() => {
       expect(screen.getByRole('button', { name: /play pronunciation for serendipity/i })).toBeTruthy();
+    });
+  });
+
+  it('renders IPA subtitle when IPA is available', async () => {
+    const mockedGenerateDefinition = vi.mocked(generateDefinition);
+    mockedGenerateDefinition.mockImplementation(async (_word, _key, _target, _native, onChunk) => {
+      onChunk('A lucky discovery by chance.');
+    });
+
+    render(<WordDefinition />);
+
+    fireEvent.change(screen.getByPlaceholderText('e.g. Serendipity'), {
+      target: { value: 'serendipity' },
+    });
+    fireEvent.click(screen.getByText('Define'));
+
+    await waitFor(() => {
+      expect(screen.getByText('/ˌser.ənˈdɪp.ə.ti/')).toBeTruthy();
+    });
+  });
+
+  it('falls back to pronunciation subtitle when IPA request fails', async () => {
+    const mockedGenerateDefinition = vi.mocked(generateDefinition);
+    mockedGenerateDefinition.mockImplementation(async (_word, _key, _target, _native, onChunk) => {
+      onChunk('A lucky discovery by chance.');
+    });
+    vi.mocked(generatePronunciationIpa).mockRejectedValue(new Error('IPA failed'));
+
+    render(<WordDefinition />);
+
+    fireEvent.change(screen.getByPlaceholderText('e.g. Serendipity'), {
+      target: { value: 'serendipity' },
+    });
+    fireEvent.click(screen.getByText('Define'));
+
+    await waitFor(() => {
+      expect(screen.getByText('Pronunciation')).toBeTruthy();
     });
   });
 

@@ -1,10 +1,18 @@
 import { GoogleGenAI } from '@google/genai';
 import type { NoteType } from '@/models/flashcard';
 import type { Language } from '@/stores/language-store';
-import { getFlashcardInstruction, getWordDefinitionInstruction } from './gemini-config';
+import {
+  getFlashcardInstruction,
+  getWordDefinitionInstruction,
+  getWordPronunciationInstruction,
+} from './gemini-config';
 
 export interface FlashcardApiResponse {
   flashcards: Record<string, string>[];
+}
+
+interface WordPronunciationApiResponse {
+  ipa: string;
 }
 
 export async function generateDefinition(
@@ -64,4 +72,41 @@ export async function generateFlashcards(
   const text = response.text || '';
   const parsed = JSON.parse(text) as FlashcardApiResponse;
   return parsed.flashcards;
+}
+
+export async function generatePronunciationIpa(
+  word: string,
+  apiKey: string,
+  targetLang: Language,
+  signal?: AbortSignal,
+): Promise<string> {
+  const genAI = new GoogleGenAI({ apiKey });
+  const { model, config } = getWordPronunciationInstruction(targetLang);
+
+  const response = await genAI.models.generateContent({
+    model,
+    config,
+    contents: [
+      {
+        role: 'user',
+        parts: [{ text: word }],
+      },
+    ],
+  });
+
+  if (signal?.aborted) {
+    return '';
+  }
+
+  const text = response.text || '';
+  if (!text) {
+    return '';
+  }
+
+  const parsed = JSON.parse(text) as Partial<WordPronunciationApiResponse>;
+  if (typeof parsed.ipa !== 'string') {
+    return '';
+  }
+
+  return parsed.ipa.trim();
 }
